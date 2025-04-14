@@ -10,6 +10,7 @@ import { Toaster } from "react-hot-toast";
 import { useCookies } from "react-cookie";
 import { MotionConfig } from "framer-motion";
 import GeneralScrollTop from "../common/GeneralScrollTop";
+import { ChatProvider } from "@/store/ChatContext";
 // import GeneralPopup from "../common/generalPopup/GeneralPopup";
 export default function Provider({ children }: { children: React.ReactNode }) {
     // const [cookies] = useCookies(["userData"]);
@@ -27,19 +28,21 @@ export default function Provider({ children }: { children: React.ReactNode }) {
             }),
     );
     const dehydratedState = dehydrate(queryClient);
-    
+
     return (
         <QueryClientProvider client={queryClient}>
-            <HydrationBoundary state={dehydratedState}>
-                <Fragment>
-                    <Navbar />
-                    <main>
-                        <Toaster position="top-right" reverseOrder={false} />
-                        {children}
-                        {/* <GeneralScrollTop /> */}
-                    </main>
-                </Fragment>
-            </HydrationBoundary>
+            <ChatProvider>
+                <HydrationBoundary state={dehydratedState}>
+                    <Fragment>
+                        {/* <Navbar /> */}
+                        <main>
+                            <Toaster position="top-right" reverseOrder={false} />
+                            {children}
+                            {/* <GeneralScrollTop /> */}
+                        </main>
+                    </Fragment>
+                </HydrationBoundary>
+            </ChatProvider>
         </QueryClientProvider>
     );
 }
