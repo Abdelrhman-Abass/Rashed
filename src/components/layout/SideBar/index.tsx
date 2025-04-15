@@ -64,15 +64,16 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile Toggle Button */}
-      {isMobile && (
+      {isMobile && !sidebarOpen && (
         <button
           className="fixed top-4 left-4 z-50 p-2 rounded-md bg-gray-800 text-white md:hidden"
           onClick={() => toggleSidebar()}
-          aria-label={sidebarOpen ? "Close menu" : "Open menu"}
+          aria-label="Open menu"
         >
-          {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+          <Menu size={24} />
         </button>
       )}
+
 
       {/* Sidebar */}
       <div
@@ -81,9 +82,9 @@ export default function Sidebar() {
           ${isMobile ? "w-64" : isCollapsed ? "w-16" : "w-64"}
           ${isMobile ? (sidebarOpen ? "translate-x-0" : "-translate-x-full") : "translate-x-0"}`}
       >
-        <div className="flex h-full flex-col p-2 overflow-hidden">
+        <div className="flex   h-full flex-col p-2 overflow-hidden">
           {/* Header */}
-          <div className={`flex items-center ${isCollapsed && !isMobile ? "justify-center" : "justify-between"} pb-4 border-b border-gray-700`}>
+          <div className={`flex items-center ${isCollapsed && !isMobile ? "justify-center" : "justify-between"} pb-4 pt-4 border-b border-gray-700`}>
             {(!isCollapsed || isMobile) && (
               <div className="flex items-center space-x-2">
                 <div className="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center">
@@ -92,7 +93,15 @@ export default function Sidebar() {
                 {!isCollapsed && <h2 className="text-xl font-bold">Chat App</h2>}
               </div>
             )}
-            
+            {isMobile && sidebarOpen && (
+              <button
+                onClick={() => toggleSidebar()}
+                className="p-1 rounded-md hover:bg-gray-700"
+                aria-label="Close menu"
+              >
+                <X size={20} />
+              </button>
+            )}
             {/* Collapse toggle - Desktop only */}
             {!isMobile && (
               <button
