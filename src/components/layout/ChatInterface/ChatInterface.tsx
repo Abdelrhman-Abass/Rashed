@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useChatStoreContent } from "@/store/chatStore";
@@ -8,7 +7,8 @@ import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 
 export default function ChatInterface() {
-  const { messages, input, setInput, sendMessage, uploadFile } = useChatStoreContent();
+  const { messages, input, setInput, sendMessage, uploadFile } =
+    useChatStoreContent();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -23,7 +23,7 @@ export default function ChatInterface() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
-    
+
     setIsLoading(true);
     try {
       // Add user message immediately
@@ -32,11 +32,11 @@ export default function ChatInterface() {
         content: input,
         role: "user" as const,
       };
-      
+
       // You'll need to modify your store to handle temporary messages
       // For now, we'll assume sendMessage handles this
       await sendMessage();
-      
+
       setInput("");
     } catch (error) {
       console.error("Error sending message:", error);
@@ -58,12 +58,12 @@ export default function ChatInterface() {
     try {
       const canvas = await html2canvas(messageElement, {
         backgroundColor: null,
-        scale: 2
+        scale: 2,
       });
 
       const pdf = new jsPDF({
         orientation: "portrait",
-        unit: "mm"
+        unit: "mm",
       });
 
       const imgData = canvas.toDataURL("image/png");
@@ -79,7 +79,7 @@ export default function ChatInterface() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isLoading]); // Also scroll when loading state changes
+  }, [messages, isLoading]);
 
   useEffect(() => {
     const container = chatContainerRef.current;
@@ -91,107 +91,113 @@ export default function ChatInterface() {
       setShowScrollButton(isNearBottom);
     };
 
-    container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-gray-100 dark:bg-gray-900">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+      <header className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-md">
         <div className="max-w-3xl mx-auto p-4">
-          <h1 className="text-xl font-semibold text-gray-800 dark:text-white">
+          <h1 className="text-2xl font-semibold text-gray-800 dark:text-white">
             ChatApp
           </h1>
         </div>
       </header>
 
       {/* Main chat area */}
-      <div 
+      <div
         ref={chatContainerRef}
-        className="flex-1 overflow-y-auto relative"
+        className="flex-1 overflow-y-auto relative p-4 max-w-3xl mx-auto"
       >
-        <div className="max-w-3xl mx-auto p-4 relative">
-          {messages.length === 0 && !isLoading ? (
-            <div className="h-full flex flex-col items-center justify-center text-center min-h-[60vh]">
-              <div className="max-w-md space-y-4">
-                <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
-                  Welcome to ChatApp
-                </h1>
-                <p className="text-gray-500 dark:text-gray-400">
-                  Start a conversation by typing a message below
-                </p>
-              </div>
+        {messages.length === 0 && !isLoading ? (
+          <div className="h-full flex flex-col items-center justify-center text-center min-h-[60vh]">
+            <div className="max-w-md space-y-4">
+              <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
+                Welcome to ChatApp
+              </h1>
+              <p className="text-gray-500 dark:text-gray-400">
+                Start a conversation by typing a message below
+              </p>
             </div>
-          ) : (
-            <div className="space-y-6">
-              {messages.map((message, index) => (
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {messages.map((message, index) => (
+              <div
+                key={message.id}
+                className={`flex ${
+                  message.role === "user" ? "justify-end" : "justify-start"
+                }`}
+              >
                 <div
-                  key={message.id}
-                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                  ref={(el) => {
+                    if (el) {
+                      messageRefs.current[message.id] = el;
+                    } else {
+                      delete messageRefs.current[message.id];
+                    }
+                  }}
+                  className={`relative max-w-[80%] rounded-lg px-4 py-3 ${
+                    message.role === "user"
+                      ? "bg-indigo-500 text-white"
+                      : "bg-gray-200 dark:bg-gray-700"
+                  } ${index < messages.length - 1 ? "mb-2" : ""}`}
                 >
-                  <div
-                    ref={(el) => {
-                      if (el) {
-                        messageRefs.current[message.id] = el;
-                      } else {
-                        delete messageRefs.current[message.id];
-                      }
-                    }}
-                    className={`relative max-w-[80%] rounded-lg px-4 py-3 ${
-                      message.role === "user"
-                        ? "bg-indigo-500 text-white"
-                        : "bg-gray-200 dark:bg-gray-700 pb-8"
-                    } ${index < messages.length - 1 ? "mb-2" : ""}`}
-                  >
-                    {message.content}
-                    
-                    {message.role !== "user" && (
-                      <button
-                        onClick={() => downloadAsPDF(message.id)}
-                        className="absolute right-2 bottom-2 flex items-center gap-1 text-xs text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 transition-colors"
-                        title="Download as PDF"
-                      >
-                        <Download className="h-3 w-3" />
-                        <span>PDF</span>
-                      </button>
-                    )}
+                  {message.content}
+
+                  {message.role !== "user" && (
+                    <button
+                      onClick={() => downloadAsPDF(message.id)}
+                      className="absolute right-2 bottom-2 flex items-center gap-1 text-xs text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 transition-colors"
+                      title="Download as PDF"
+                    >
+                      <Download className="h-3 w-3" />
+                      <span>PDF</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {/* Loading indicator */}
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="relative max-w-[80%] rounded-lg px-4 py-3 bg-gray-200 dark:bg-gray-700">
+                  <div className="flex space-x-2">
+                    <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce"></div>
+                    <div
+                      className="w-2 h-2 rounded-full bg-gray-400 animate-bounce"
+                      style={{ animationDelay: "0.2s" }}
+                    ></div>
+                    <div
+                      className="w-2 h-2 rounded-full bg-gray-400 animate-bounce"
+                      style={{ animationDelay: "0.4s" }}
+                    ></div>
                   </div>
                 </div>
-              ))}
+              </div>
+            )}
 
-              {/* Loading indicator for assistant response */}
-              {isLoading && (
-                <div className="flex justify-start">
-                  <div className="relative max-w-[80%] rounded-lg px-4 py-3 bg-gray-200 dark:bg-gray-700">
-                    <div className="flex space-x-2">
-                      <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce"></div>
-                      <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                      <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0.4s' }}></div>
-                    </div>
-                  </div>
-                </div>
-              )}
+            <div ref={messagesEndRef} />
+          </div>
+        )}
 
-              <div ref={messagesEndRef} />
-            </div>
-          )}
-
-          {/* Scroll to bottom button */}
-          {showScrollButton && (
-            <button
-              onClick={scrollToBottom}
-              className="fixed right-9 md:right-12 md:bottom-30 bottom-24 z-10 p-2 rounded-full bg-gray-200 dark:bg-gray-700 shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-              aria-label="Scroll to bottom"
-            >
-              <ChevronDown className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-            </button>
-          )}
-        </div>
+        {/* Scroll to bottom button */}
+        {showScrollButton && (
+          <button
+            onClick={scrollToBottom}
+            className="fixed right-8 md:right-12 md:bottom-30 bottom-24 z-10 p-3 rounded-full bg-gray-200 dark:bg-gray-700 shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+            aria-label="Scroll to bottom"
+          >
+            <ChevronDown className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+          </button>
+        )}
       </div>
 
       {/* Input area */}
-      <div className="sticky bottom-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+      <div className="sticky bottom-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
         <div className="max-w-3xl mx-auto p-4">
           <form
             onSubmit={handleSubmit}
@@ -224,9 +230,9 @@ export default function ChatInterface() {
               type="submit"
               disabled={!input.trim() || isLoading}
               className={`p-1 rounded-full ${
-                !input.trim() || isLoading 
-                  ? 'text-gray-400' 
-                  : 'text-blue-500 hover:text-blue-600'
+                !input.trim() || isLoading
+                  ? "text-gray-400"
+                  : "text-blue-500 hover:text-blue-600"
               }`}
               aria-label="Send message"
             >

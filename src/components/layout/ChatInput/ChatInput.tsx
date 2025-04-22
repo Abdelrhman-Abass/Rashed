@@ -34,21 +34,25 @@ export default function ChatInput() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-4 bg-gray-100 border-t border-gray-300 flex items-center"
+      className="p-4 bg-zinc-900 border-t border-zinc-700 flex items-center gap-x-3"
     >
       <input
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
         placeholder="Type a message..."
-        className="flex-1 p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="flex-1 p-3 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
       />
       <button
         type="submit"
         disabled={mutation.isPending}
-        className="ml-2 bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
+        className="ml-3 bg-indigo-600 text-white p-3 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
       >
-        {mutation.isPending ? "Sending..." : "Send"}
+        {mutation.isPending ? (
+          <span className="animate-pulse">Sending...</span>
+        ) : (
+          "Send"
+        )}
       </button>
     </form>
   );
