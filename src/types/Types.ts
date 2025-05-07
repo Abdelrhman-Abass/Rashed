@@ -13,11 +13,18 @@ export interface MessageType {
     updatedAt: string
   }
 
+  // export interface Message {
+  //   id: string;
+  //   content: string;
+  //   sender: "user" | "bot";
+  //   timestamp: string;
+  // }
+
   export interface Message {
     id: string;
     content: string;
-    sender: "user" | "bot";
-    timestamp: string;
+    isFromBot: boolean;
+    createdAt: string;
   }
 
 
