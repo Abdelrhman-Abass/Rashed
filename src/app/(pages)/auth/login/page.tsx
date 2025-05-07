@@ -2,28 +2,31 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { IoLogoFacebook } from "react-icons/io5";
-import { IoLogoGoogle } from "react-icons/io5";
-import { IoLogoGithub } from "react-icons/io5";
-import { IoEyeSharp, IoEyeOffSharp } from "react-icons/io5";
-import { IoMailOutline } from "react-icons/io5";
-import { IoLockClosedOutline } from "react-icons/io5";
+import { useRouter } from "next/navigation";
+import { IoLogoFacebook, IoLogoGoogle, IoLogoGithub } from "react-icons/io5";
+import { IoEyeSharp, IoEyeOffSharp, IoMailOutline, IoLockClosedOutline } from "react-icons/io5";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useMutation } from "@tanstack/react-query";
+import { useAuthStore } from "@/store/authStore";
+import { postServerRequest } from "@/utils/generalServerRequest";
+import { showErrorToast, showSuccessToast } from "@/utils/toast";
 
 // Define Zod schema for validation
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"), // Fixed error message
 });
 
 type LoginFormInputs = z.infer<typeof loginSchema>;
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
+  const { login } = useAuthStore();
 
   // Initialize react-hook-form with Zod resolver
   const {
@@ -34,33 +37,53 @@ const Login = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  // Handle form submission
-  const onSubmit = async (data: LoginFormInputs) => {
-    try {
-      // Simulate an API call or data submission
-      console.log("Form submitted:", data);
+  const createSessionMutation = useMutation({
+    mutationFn: () => postServerRequest("/messages/session", { title: "New Chat" }),
+    onSuccess: (response) => {
+      console.log(response)
+      if (response?.data?.success) {
+        const { sessionId } = response.data.data;
+        router.push(`/chat/${sessionId}`);
+      } else {
+        showErrorToast("Failed to start a new chat session.");
+        router.push("/"); // Redirect to home if session creation fails
+      }
+    },
+    onError: () => {
+      showErrorToast("An error occurred while starting a new chat session.");
+      router.push("/");
+    },
+  });
 
-      // Simulate a successful response
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate network delay
-      toast.success("Login successful!", {
-        position: "top-center",
-        autoClose: 2000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-    } catch (error) {
-      // Simulate an error response
-      toast.error("Failed to login. Please try again.", {
-        position: "top-center",
-        autoClose: 2000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-    }
+
+  // React Query mutation for login
+  const loginMutation = useMutation({
+    mutationFn: (data: LoginFormInputs) => postServerRequest("/auth/login", data),
+    onSuccess: (response) => {
+      console.log("Login response:", response); // Log the entire response for debugging
+      // Since postServerRequest wraps the response in { success, data }, access response.data
+      if (response?.data?.success) {
+        const { token, user } = response.data.data; // response.data contains the actual API response
+        login(token, { email: user.email });
+        // console.log("Login successful:", response.data.data);
+        showSuccessToast("Login successful!");
+        createSessionMutation.mutate();
+
+        // router.push("/chat");
+      } else {
+        showErrorToast(response?.message || "Failed to login. Please try again.");
+      }
+    },
+    onError: (error: any) => {
+      showErrorToast(error?.message || "An error occurred. Please try again.");
+
+    },
+  });
+
+  // Handle form submission
+  const onSubmit = (data: LoginFormInputs) => {
+    console.log("Form submitted:", data);
+    loginMutation.mutate(data);
   };
 
   return (
@@ -72,13 +95,13 @@ const Login = () => {
           <Image
             src="/assets/logo.png"
             alt="logo"
-            width={60}
-            height={60}
+            width={70}
+            height={70}
             className="mb-4"
           />
 
           {/* Title */}
-          <h1 className="text-xl font-bold text-white mb-2">Login</h1>
+          <h1 className="text-2xl font-bold text-white mb-2">Login</h1>
           <p className="text-xs text-gray-300 mb-4">Great to see you again!</p>
 
           {/* Form */}
@@ -154,9 +177,12 @@ const Login = () => {
             {/* Login Button */}
             <button
               type="submit"
-              className="bg-blue-500 text-white font-semibold rounded-md p-2 mt-4 hover:bg-blue-600 transition duration-300 active:scale-95 text-sm"
+              disabled={loginMutation.isPending}
+              className={`bg-blue-500 text-white font-semibold rounded-md p-2 mt-4 hover:bg-blue-600 transition duration-300 active:scale-95 text-sm ${
+                loginMutation.isPending ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              Login
+              {loginMutation.isPending ? "Logging in..." : "Login"}
             </button>
           </form>
 

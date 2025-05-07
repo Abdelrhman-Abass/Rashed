@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useChatStore } from "@/store/chatStore";
-import ChatContainer from "@/components/layout/ChatContainer/ChatContainer";
-import ChatInput from "@/components/layout/ChatInput/ChatInput";
+// import ChatContainer from "@/components/layout/ChatContainer/ChatContainer";
+// import ChatInput from "@/components/layout/ChatInput/ChatInput";
 import Sidebar from "@/components/layout/SideBar";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
@@ -39,12 +39,12 @@ export default function Home() {
           marginRight: `${marginLeft - sidebarWidth}px`,
         }}
       >
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6">
+        {/* <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6">
           <ChatContainer />
         </div>
         <div className="w-full bg-zinc-800 border-t border-zinc-700 p-2 md:p-4 shadow-md">
           <ChatInput />
-        </div>
+        </div> */}
       </main>
 
       {/* Mobile overlay backdrop */}

@@ -1,56 +1,110 @@
 "use client";
 
-import { useChatStoreContent } from "@/store/chatStore";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Paperclip, Send, ChevronDown, Download } from "lucide-react";
-import { useRef, useEffect, useState } from "react";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 
+import { useAuthStore } from "@/store/authStore";
+import { getServerRequest, postServerRequest, postFileServerRequest } from "@/utils/generalServerRequest";
+import { showSuccessToast, showErrorToast } from "@/utils/toast";
+import ChatHeader from "../ChatHeader/ChatHeader";
+import MessageBubble from "../MessageBubble/MessageBubble";
+import { Message } from "@/types/Types";
+import ChatInput from "../ChatInput/ChatInput";
+
+
+
+// Main Chat Interface Component
 export default function ChatInterface() {
-  const { messages, input, setInput, sendMessage, uploadFile } =
-    useChatStoreContent();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const [newMessage, setNewMessage] = useState("");
   const [showScrollButton, setShowScrollButton] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const messageRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  const router = useRouter();
+  const { id: sessionId } = useParams();
+  const { token, logout } = useAuthStore();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+
+
+  // Fetch messages
+  const { data: messagesResponse, refetch: fetchMessages, isLoading, error, status } = useQuery({
+    queryKey: ["messages", sessionId],
+    queryFn: async () => {
+      const response = await getServerRequest(`/messages/get-message/${sessionId}`);
+      console.log("Messages Response:", response);
+      return response;
+    },
+    enabled: !!sessionId && !!token,
+    select: (response) => {
+      console.log("Select Function - Response:", response);
+      // Check for nested data.data structure
+      const nestedData = response.success && response.data && response.data.success && Array.isArray(response.data.data)
+        ? response.data.data
+        : [];
+      return nestedData;
+    },
+    // refetchInterval: 50000, // Poll every 5 seconds
+  });
+
+  useEffect(()=> {
+    fetchMessages(); // Fetch messages on mount
+  },[fetchMessages, sessionId]); // Refetch when sessionId or token changes
+
+  // Debug messagesResponse
+
+  const messages = useMemo(() => {
+    console.log("useMemo - messagesResponse:", messagesResponse);
+    const msgArray = Array.isArray(messagesResponse) ? messagesResponse : [];
+    console.log("useMemo - Processed Messages:", msgArray);
+    return msgArray;
+  }, [messagesResponse]);
+
+
+  // Send a message
+  const { mutate: sendMessage, isPending: isSending } = useMutation({
+    mutationFn: (content: string) =>
+      postServerRequest(`/messages/send-message/${sessionId}`, { content }),
+    onSuccess: (response) => {
+      if (response.success) {
+        console.log("Message sent successfully, refetching messages...");
+        fetchMessages(); // Force refetch after sending
+        setNewMessage(""); // Clear input on success
+      } else {
+        showErrorToast(response.message || "Failed to send message.");
+      }
+    },
+    onError: (error: any) => {
+      showErrorToast("An error occurred while sending the message: " + (error.message || "Unknown error"));
+    },
+  });
+
+  // Handle form submission
+  const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
-
-    setIsLoading(true);
-    try {
-      // Add user message immediately
-      const userMessage = {
-        id: Date.now().toString(),
-        content: input,
-        role: "user" as const,
-      };
-
-      // You'll need to modify your store to handle temporary messages
-      // For now, we'll assume sendMessage handles this
-      await sendMessage();
-
-      setInput("");
-    } catch (error) {
-      console.error("Error sending message:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    if (!newMessage.trim() || !sessionId) return;
+    sendMessage(newMessage);
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle file upload
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
-      uploadFile(e.target.files[0]);
+      const file = e.target.files[0];
+      const response = await postFileServerRequest(`/upload/${sessionId}`, file);
+      if (response.success) {
+        showSuccessToast(`File ${file.name} uploaded.`);
+        sendMessage(`Uploaded file: ${response.data.url || file.name}`);
+      } else {
+        showErrorToast(response.message || "Failed to upload file.");
+      }
     }
   };
 
+  // Handle PDF download
   const downloadAsPDF = async (messageId: string) => {
     const messageElement = messageRefs.current[messageId];
     if (!messageElement) return;
@@ -74,13 +128,21 @@ export default function ChatInterface() {
       pdf.save(`chat-response-${messageId.slice(0, 5)}.pdf`);
     } catch (error) {
       console.error("Error generating PDF:", error);
+      showErrorToast("Failed to download message as PDF.");
     }
   };
 
+  // Scroll to bottom
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  // Auto-scroll to bottom when messages change
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isLoading]);
+  }, [messages]);
 
+  // Handle scroll button visibility
   useEffect(() => {
     const container = chatContainerRef.current;
     if (!container) return;
@@ -95,156 +157,83 @@ export default function ChatInterface() {
     return () => container.removeEventListener("scroll", handleScroll);
   }, []);
 
-  return (
-    <div className="flex flex-col h-full bg-gray-100 dark:bg-gray-900">
-      {/* Header */}
-      <header className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-md">
-        <div className="max-w-3xl mx-auto p-4">
-          <h1 className="text-2xl font-semibold text-gray-800 dark:text-white">
-            ChatApp
-          </h1>
-        </div>
-      </header>
+  // Handle logout
+  const handleLogout = async () => {
+    await logout();
+    showSuccessToast("Logged out successfully!");
+    router.push("/login");
+  };
 
-      {/* Main chat area */}
+  // Loading state
+  if (!sessionId) {
+    return (
+      <div className="flex items-center justify-center h-screen text-white">
+        Loading...
+      </div>
+    );
+  }
+
+  // Show loading state while fetching
+  if (isLoading) {
+    return (
+      <div className="flex flex-col h-screen  text-white">
+        <ChatHeader sessionId={sessionId as string} onLogout={handleLogout} />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-white">Loading messages...</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col h-screen  text-white">
+      <ChatHeader sessionId={sessionId as string} onLogout={handleLogout} />
+
       <div
         ref={chatContainerRef}
-        className="flex-1 overflow-y-auto relative p-4 max-w-3xl mx-auto"
+        className="flex-1 overflow-y-auto relative p-6  "
       >
-        {messages.length === 0 && !isLoading ? (
+        {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center min-h-[60vh]">
             <div className="max-w-md space-y-4">
-              <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
-                Welcome to ChatApp
-              </h1>
-              <p className="text-gray-500 dark:text-gray-400">
-                Start a conversation by typing a message below
+              <h1 className="text-3xl font-bold">Welcome to ChatApp</h1>
+              <p className="text-gray-400">
+                Start a conversation by typing a message below.
               </p>
             </div>
           </div>
         ) : (
-          <div className="space-y-6">
-            {messages.map((message, index) => (
-              <div
+          <div className="space-y-2 mx-0 md:mx-[15%] ">
+            {messages.map((message: Message, index: number) => (
+              <MessageBubble
                 key={message.id}
-                className={`flex ${
-                  message.role === "user" ? "justify-end" : "justify-start"
-                }`}
-              >
-                <div
-                  ref={(el) => {
-                    if (el) {
-                      messageRefs.current[message.id] = el;
-                    } else {
-                      delete messageRefs.current[message.id];
-                    }
-                  }}
-                  className={`relative max-w-[80%] rounded-lg px-4 py-3 ${
-                    message.role === "user"
-                      ? "bg-indigo-500 text-white"
-                      : "bg-gray-200 dark:bg-gray-700"
-                  } ${index < messages.length - 1 ? "mb-2" : ""}`}
-                >
-                  {message.content}
-
-                  {message.role !== "user" && (
-                    <button
-                      onClick={() => downloadAsPDF(message.id)}
-                      className="absolute right-2 bottom-2 flex items-center gap-1 text-xs text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 transition-colors"
-                      title="Download as PDF"
-                    >
-                      <Download className="h-3 w-3" />
-                      <span>PDF</span>
-                    </button>
-                  )}
-                </div>
-              </div>
+                message={message}
+                isLast={index === messages.length - 1}
+                onDownloadPDF={downloadAsPDF}
+              />
             ))}
-
-            {/* Loading indicator */}
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="relative max-w-[80%] rounded-lg px-4 py-3 bg-gray-200 dark:bg-gray-700">
-                  <div className="flex space-x-2">
-                    <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce"></div>
-                    <div
-                      className="w-2 h-2 rounded-full bg-gray-400 animate-bounce"
-                      style={{ animationDelay: "0.2s" }}
-                    ></div>
-                    <div
-                      className="w-2 h-2 rounded-full bg-gray-400 animate-bounce"
-                      style={{ animationDelay: "0.4s" }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
-            )}
-
             <div ref={messagesEndRef} />
           </div>
         )}
 
-        {/* Scroll to bottom button */}
         {showScrollButton && (
           <button
             onClick={scrollToBottom}
-            className="fixed right-8 md:right-12 md:bottom-30 bottom-24 z-10 p-3 rounded-full bg-gray-200 dark:bg-gray-700 shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+            className="fixed right-8 bottom-24 z-10 p-3 rounded-full bg-indigo-500 shadow-lg hover:bg-indigo-600 transition-colors"
             aria-label="Scroll to bottom"
           >
-            <ChevronDown className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+            <ChevronDown className="h-5 w-5 text-white" />
           </button>
         )}
       </div>
 
-      {/* Input area */}
-      <div className="sticky bottom-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-        <div className="max-w-3xl mx-auto p-4">
-          <form
-            onSubmit={handleSubmit}
-            className="flex items-center gap-2 w-full border border-gray-300 dark:border-gray-600 rounded-full px-4 py-2 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent bg-gray-50 dark:bg-gray-800"
-          >
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              className="hidden"
-              accept="*"
-            />
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-              aria-label="Upload file"
-              disabled={isLoading}
-            >
-              <Paperclip className="h-5 w-5" />
-            </button>
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Type a message..."
-              className="flex-1 py-1 px-2 bg-transparent focus:outline-none"
-              disabled={isLoading}
-            />
-            <button
-              type="submit"
-              disabled={!input.trim() || isLoading}
-              className={`p-1 rounded-full ${
-                !input.trim() || isLoading
-                  ? "text-gray-400"
-                  : "text-blue-500 hover:text-blue-600"
-              }`}
-              aria-label="Send message"
-            >
-              {isLoading ? (
-                <div className="h-5 w-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-              ) : (
-                <Send className="h-5 w-5" />
-              )}
-            </button>
-          </form>
-        </div>
-      </div>
+      <ChatInput
+        value={newMessage}
+        onChange={setNewMessage}
+        onSubmit={handleSendMessage}
+        onFileChange={handleFileChange}
+        isSending={isSending}
+      />
     </div>
   );
 }
