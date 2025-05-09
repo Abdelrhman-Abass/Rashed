@@ -12,6 +12,12 @@ export interface MessageType {
     createdAt: string
     updatedAt: string
   }
+  export interface User {
+    email: string;
+    id?: string; // Add other fields as needed
+    userName:string;
+  }
+  
 
   // export interface Message {
   //   id: string;

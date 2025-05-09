@@ -11,12 +11,14 @@ const ChatInput = ({
   onSubmit,
   onFileChange,
   isSending,
+  start,
 }: {
   value: string;
   onChange: (value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   isSending: boolean;
+  start: boolean;
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -56,11 +58,11 @@ const ChatInput = ({
 
 
   return (
-    <div className="sticky bottom-0  border-t ">
-      <div className="max-w-4xl mx-auto p-4">
+    <div className={`sticky bottom-0  ${!start && "border-t"} `}>
+      <div className="max-w-4xl mx-auto  p-8">
         <form
           onSubmit={onSubmit}
-          className="flex items-center gap-2 w-full border border-gray-600 rounded-2xl  px-4 py-2 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-transparent  bg-[#2e3033]"
+          className={`flex items-center gap-2 w-full ${!start && " border border-gray-600 "}  rounded-2xl  px-8 py-4 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-transparent  bg-[#2e3033]`}
         >
           <input
             type="file"
@@ -96,10 +98,10 @@ const ChatInput = ({
             >
               <path
                 d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z"
-                stroke-width="1.5"
+                strokeWidth="1.5"
               ></path>
-              <path d="M8 12H16" stroke-width="1.5"></path>
-              <path d="M12 16V8" stroke-width="1.5"></path>
+              <path d="M8 12H16" strokeWidth="1.5"></path>
+              <path d="M12 16V8" strokeWidth="1.5"></path>
             </svg>
           </button>
 

@@ -361,7 +361,7 @@ const Signup = () => {
       if (response?.data?.success) { // Check response.success directly
         console.log(response)
         const { token, name, email } = response.data.data;
-        login(token, { email });
+        login(token, { email , userName: name});
         showSuccessToast("Registration successful!");
         createSessionMutation.mutate();
         // router.push("/chat");
@@ -380,13 +380,13 @@ const Signup = () => {
   };
 
   return (
-    <div className="bg-[url('/assets/background.png')] bg-cover bg-center bg-no-repeat w-full h-screen relative overflow-hidden">
+    <div className="bg-[url('/assets/background.webp')] bg-cover bg-center bg-no-repeat w-full h-screen relative overflow-hidden">
       {/* Centered Signup Box */}
       <div className="flex justify-center items-center h-full w-full">
         <div className="flex flex-col items-center bg-white/10 backdrop-blur-md border border-white/20 rounded-lg p-6 shadow-lg max-w-sm w-full my-8">
           {/* Logo */}
           <Image
-            src="/assets/logo.png"
+            src="/assets/logo.webp"
             alt="logo"
             width={70}
             height={70}

@@ -31,7 +31,7 @@ const MessageBubble = ({
                 ref={messageRef}
                 dir="auto"
 
-                className={`message-bubble rounded-3xl prose dark:prose-invert break-words text-primary min-h-7 prose-p:opacity-95 prose-strong:opacity-100 bg-surface-l2 border border-border-l1 max-w-[100%] sm:max-w-[90%] px-4 py-2.5 whitespace-pre-wrap rounded-br-lg relative text-4xl ${message.isFromBot ? "bg-transparent text-white" : "bg-[#2e3033] text-[#fcfcfc]"
+                className={`message-bubble rounded-3xl prose dark:prose-invert break-words text-primary min-h-7 prose-p:opacity-95 prose-strong:opacity-100 bg-surface-l2   max-w-[100%] sm:max-w-[70%] px-4 py-2.5 whitespace-pre-wrap rounded-br-lg relative text-4xl ${message.isFromBot ? "bg-transparent text-white" : "bg-[#2e3033] text-[#fcfcfc]"
                     } ${isLast ? "" : "mb-2"}`}
             >
                 <div className="text-xl text-[#fcfcfc]">{message.content}</div>

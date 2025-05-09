@@ -64,7 +64,9 @@ const Login = () => {
       // Since postServerRequest wraps the response in { success, data }, access response.data
       if (response?.data?.success) {
         const { token, user } = response.data.data; // response.data contains the actual API response
-        login(token, { email: user.email });
+        console.log("Token:", token); // Log the token for debugging
+        console.log("User:", user); // Log the user for debugging
+        login(token, { email: user.email , userName: user.name }); // Store token and user in Zustand store
         // console.log("Login successful:", response.data.data);
         showSuccessToast("Login successful!");
         createSessionMutation.mutate();
@@ -87,13 +89,13 @@ const Login = () => {
   };
 
   return (
-    <div className="bg-[url('/assets/background.png')] bg-cover bg-center bg-no-repeat w-full h-screen relative overflow-hidden">
+    <div className="bg-[url('/assets/background.webp')] bg-cover bg-center bg-no-repeat w-full h-screen relative overflow-hidden">
       {/* Centered Login Box */}
       <div className="flex justify-center items-center h-full w-full">
         <div className="flex flex-col items-center bg-white/10 backdrop-blur-md border border-white/20 rounded-lg p-6 shadow-lg max-w-sm w-full my-8">
           {/* Logo */}
           <Image
-            src="/assets/logo.png"
+            src="/assets/logo.webp"
             alt="logo"
             width={70}
             height={70}
