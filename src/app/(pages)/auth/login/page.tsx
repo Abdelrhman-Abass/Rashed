@@ -4,7 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { IoLogoFacebook, IoLogoGoogle, IoLogoGithub } from "react-icons/io5";
-import { IoEyeSharp, IoEyeOffSharp, IoMailOutline, IoLockClosedOutline } from "react-icons/io5";
+import {
+  IoEyeSharp,
+  IoEyeOffSharp,
+  IoMailOutline,
+  IoLockClosedOutline,
+} from "react-icons/io5";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,9 +43,10 @@ const Login = () => {
   });
 
   const createSessionMutation = useMutation({
-    mutationFn: () => postServerRequest("/messages/session", { title: "New Chat" }),
+    mutationFn: () =>
+      postServerRequest("/messages/session", { title: "New Chat" }),
     onSuccess: (response) => {
-      console.log(response)
+      console.log(response);
       if (response?.data?.success) {
         const { sessionId } = response.data.data;
         router.push(`/chat/${sessionId}`);
@@ -55,10 +61,10 @@ const Login = () => {
     },
   });
 
-
   // React Query mutation for login
   const loginMutation = useMutation({
-    mutationFn: (data: LoginFormInputs) => postServerRequest("/auth/login", data),
+    mutationFn: (data: LoginFormInputs) =>
+      postServerRequest("/auth/login", data),
     onSuccess: (response) => {
       console.log("Login response:", response); // Log the entire response for debugging
       // Since postServerRequest wraps the response in { success, data }, access response.data
@@ -66,19 +72,20 @@ const Login = () => {
         const { token, user } = response.data.data; // response.data contains the actual API response
         console.log("Token:", token); // Log the token for debugging
         console.log("User:", user); // Log the user for debugging
-        login(token, { email: user.email , userName: user.name }); // Store token and user in Zustand store
+        login(token, { email: user.email, userName: user.name }); // Store token and user in Zustand store
         // console.log("Login successful:", response.data.data);
         showSuccessToast("Login successful!");
         createSessionMutation.mutate();
 
         // router.push("/chat");
       } else {
-        showErrorToast(response?.message || "Failed to login. Please try again.");
+        showErrorToast(
+          response?.message || "Failed to login. Please try again."
+        );
       }
     },
     onError: (error: any) => {
       showErrorToast(error?.message || "An error occurred. Please try again.");
-
     },
   });
 
@@ -169,7 +176,7 @@ const Login = () => {
                 <label className="text-white text-xs ml-2">Remember me</label>
               </div>
               <Link
-                href="/auth/forgetpassword"
+                href="/auth/forgot-password"
                 className="text-blue-400 text-xs hover:underline"
               >
                 Forget Password ?
