@@ -16,7 +16,7 @@ const ChatHeader = ({ sessionId, onLogout }: { sessionId: string; onLogout: () =
   });
 
   return (
-    <header className="sticky top-0 z-10  shadow-sm">
+    <header className="sticky top-0 z-10 bg-[#1a1a2e]  shadow-sm">
       <div className="max-w-4xl mx-auto p-4 flex justify-center items-center">
         <h1 className="text-lg font-semibold text-white">
           {chatInfoLoading

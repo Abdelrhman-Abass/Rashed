@@ -18,6 +18,8 @@ import { Message } from "@/types/Types";
 import ChatInput from "../ChatInput/ChatInput";
 import Loader from "@/components/common/Loader";
 
+
+
 export default function ChatInterface() {
   const [newMessage, setNewMessage] = useState("");
   const [showScrollButton, setShowScrollButton] = useState(false);
@@ -328,7 +330,7 @@ export default function ChatInterface() {
   }
 
   return (
-    <div className="flex flex-col h-screen text-white">
+    <div className="flex flex-col h-screen text-white bg-gradient-radial backdrop-blur-xl">
       <ChatHeader sessionId={sessionId as string} onLogout={handleLogout} />
       <ToastContainer />
       {messages.length === 0 ? (

@@ -1,27 +1,11 @@
 "use client";
-import ChatInterface from "@/components/layout/ChatInterface/ChatInterface";
-// import ChatSidebar from "@/components/layout/SideBar";
-
-// export default function Home() {
-  
-//   return (
-//     <div className="flex h-screen bg-gray-100">
-//       <ChatSidebar />
-//       <div className="flex-1 flex flex-col md:ml-64">
-        
-//         <ChatInterface />
-//       </div>
-//     </div>
-//   );
-// }
-
 
 import { useState, useEffect } from "react";
 import { useChatStore } from "@/store/chatStore";
-// import ChatContainer from "@/components/layout/ChatContainer/ChatContainer";
-// import ChatInput from "@/components/layout/ChatInput/ChatInput";
+
 import Sidebar from "@/components/layout/SideBar";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import ChatInterface from "@/components/layout/ChatInterface/ChatInterface";
 
 export default function Home() {
   const { isCollapsed, sidebarOpen, setSidebarOpen } = useChatStore();
@@ -65,7 +49,7 @@ export default function Home() {
       {/* Mobile overlay backdrop */}
       {isMobile && sidebarOpen && (
         <div
-          className="sticky inset-0 bg-black bg-opacity-50 z-30 m-4 transition-all duration-300"
+          className="sticky inset-0  bg-opacity-50 z-30 m-4 transition-all duration-300"
           onClick={handleSidebarToggle}
         />
       )}
