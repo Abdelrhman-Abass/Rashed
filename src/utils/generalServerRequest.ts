@@ -65,7 +65,7 @@ export const postServerRequest = async (url: string, data: any) => {
 
 export const patchServerRequest = async (url: string, data: any) => {
   try {
-    const response = await AxiosInstance.post(url, data);
+    const response = await AxiosInstance.patch(url, data);
     return {
       success: true,
       data: response.data,
