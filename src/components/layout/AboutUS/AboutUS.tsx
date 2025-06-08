@@ -5,10 +5,7 @@ import Link from "next/link";
 
 const AboutUs = () => {
   return (
-    <section
-      id="about"
-      className="bg-gray-900 text-white min-h-screen py-16 px-4"
-    >
+    <section id="about" className=" text-white min-h-screen py-16 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Hero Section */}
         <motion.div

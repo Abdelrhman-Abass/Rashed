@@ -1,14 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { 
-  Facebook, 
-  Chrome, 
-  Github,
-  Eye,
-  EyeOff,
-  Mail,
-  Lock,
-} from "lucide-react";
+import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import AstronautSpaceLanding from "@/components/layout/RightLogin";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -21,6 +13,7 @@ import { postServerRequest } from "@/utils/generalServerRequest";
 import { showErrorToast, showSuccessToast } from "@/utils/toast";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 
 // Define Zod schema for validation
 const loginSchema = z.object({
@@ -102,10 +95,10 @@ const Login: React.FC = () => {
     const createStars = () => {
       if (!starsRef.current) return;
       const numberOfStars = 200;
-      
+
       for (let i = 0; i < numberOfStars; i++) {
-        const star = document.createElement('div');
-        star.className = 'absolute bg-white rounded-full animate-pulse';
+        const star = document.createElement("div");
+        star.className = "absolute bg-white rounded-full animate-pulse";
         star.style.left = `${Math.random() * 100}%`;
         star.style.top = `${Math.random() * 100}%`;
         const size = Math.random() * 3 + 1;
@@ -119,17 +112,18 @@ const Login: React.FC = () => {
 
     const createParticles = () => {
       if (!particlesRef.current) return;
-      
+
       const addParticle = () => {
-        const particle = document.createElement('div');
-        particle.className = 'absolute bg-white/60 rounded-full animate-float-up';
+        const particle = document.createElement("div");
+        particle.className =
+          "absolute bg-white/60 rounded-full animate-float-up";
         particle.style.left = `${Math.random() * 100}%`;
-        particle.style.bottom = '-10px';
+        particle.style.bottom = "-10px";
         const size = Math.random() * 4 + 2;
         particle.style.width = `${size}px`;
         particle.style.height = `${size}px`;
         particlesRef.current?.appendChild(particle);
-        
+
         setTimeout(() => {
           particle.remove();
         }, 8000);
@@ -141,21 +135,23 @@ const Login: React.FC = () => {
 
     const createShootingStars = () => {
       if (!shootingStarsRef.current) return;
-      
+
       const addShootingStar = () => {
-        const shootingStar = document.createElement('div');
-        shootingStar.className = 'absolute w-0.5 h-0.5 bg-white rounded-full animate-shoot';
+        const shootingStar = document.createElement("div");
+        shootingStar.className =
+          "absolute w-0.5 h-0.5 bg-white rounded-full animate-shoot";
         shootingStar.style.top = `${Math.random() * 50}%`;
-        shootingStar.style.left = '-100px';
-        shootingStar.style.boxShadow = '0 0 6px 2px rgba(255,255,255,0.8)';
-        
-        const tail = document.createElement('div');
-        tail.className = 'absolute top-0 left-0 w-12 h-px bg-gradient-to-r from-transparent via-white to-transparent';
-        tail.style.transform = 'translateX(-48px)';
+        shootingStar.style.left = "-100px";
+        shootingStar.style.boxShadow = "0 0 6px 2px rgba(255,255,255,0.8)";
+
+        const tail = document.createElement("div");
+        tail.className =
+          "absolute top-0 left-0 w-12 h-px bg-gradient-to-r from-transparent via-white to-transparent";
+        tail.style.transform = "translateX(-48px)";
         shootingStar.appendChild(tail);
-        
+
         shootingStarsRef.current?.appendChild(shootingStar);
-        
+
         setTimeout(() => {
           shootingStar.remove();
         }, 3000);
@@ -186,12 +182,18 @@ const Login: React.FC = () => {
       {/* Content Container */}
       <div className="flex flex-col lg:flex-row w-full items-center justify-center  max-w-5xl gap-6 relative z-10">
         {/* Left Box - Login Form */}
-        <div style={{width : "fit-content"}} className="  lg:w-1/2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl animate-fadeInLeft" >
-          {/* Mobile Logo */}
-          <div className="flex justify-center mb-6 lg:hidden">
+        <div
+          style={{ width: "fit-content" }}
+          className="  lg:w-1/2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl animate-fadeInLeft"
+        >
+          <div className="flex justify-center mb-6">
             <div className="w-16 h-16  rounded-xl flex items-center justify-center shadow-lg animate-float">
-              {/* <div className="text-white text-2xl font-bold">AI</div> */}
-              <Image src="/assets/white_logo.png" alt="logo" width={50} height={50} />
+              <Image
+                src="/assets/white_logo.png"
+                alt="logo"
+                width={50}
+                height={50}
+              />
             </div>
           </div>
 
@@ -212,7 +214,10 @@ const Login: React.FC = () => {
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                <Mail
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={16}
+                />
                 <input
                   type="email"
                   {...register("email")}
@@ -232,7 +237,10 @@ const Login: React.FC = () => {
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                <Lock
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={16}
+                />
                 <input
                   type={showPassword ? "text" : "password"}
                   {...register("password")}
@@ -263,12 +271,17 @@ const Login: React.FC = () => {
                 />
                 <span className="text-gray-300">Remember me</span>
               </label>
-              <button
-                type="button"
+              <Link
+                href="/auth/forgot-password"
                 className="text-blue-400 hover:text-blue-300 transition-all duration-200"
               >
-                Forgot Password?
-              </button>
+                <button
+                  type="button"
+                  className="text-blue-400 hover:text-blue-300 transition-all duration-200"
+                >
+                  Forgot Password?
+                </button>
+              </Link>
             </div>
 
             <button
@@ -297,24 +310,26 @@ const Login: React.FC = () => {
             <div className="flex-grow border-t border-white/20"></div>
           </div>
 
-          
-
           <div className="text-center space-y-2 text-sm">
             <p className="text-gray-300">
               Don&apos;t have an account?{" "}
-              <button className="text-blue-400 hover:text-blue-300 transition-all duration-200">
-                Sign Up
-              </button>
+              <Link href="/auth/signup">
+                <button className="text-blue-400 hover:text-blue-300 transition-all duration-200">
+                  Sign Up
+                </button>
+              </Link>
             </p>
             <div className="flex justify-center space-x-3 text-xs text-gray-400">
-              {["Terms & Conditions", "Support", "Customer Service"].map((link, index) => (
-                <React.Fragment key={link}>
-                  <button className="hover:text-blue-400 transition-all duration-200">
-                    {link}
-                  </button>
-                  {index < 2 && <span>|</span>}
-                </React.Fragment>
-              ))}
+              {["Terms & Conditions", "Support", "Customer Service"].map(
+                (link, index) => (
+                  <React.Fragment key={link}>
+                    <button className="hover:text-blue-400 transition-all duration-200">
+                      {link}
+                    </button>
+                    {index < 2 && <span>|</span>}
+                  </React.Fragment>
+                )
+              )}
             </div>
           </div>
         </div>

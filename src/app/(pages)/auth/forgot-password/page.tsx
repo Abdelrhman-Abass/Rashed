@@ -1,9 +1,7 @@
-
-
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import { Mail, Facebook, Chrome, Github } from "lucide-react";
+import { Mail } from "lucide-react";
 import AstronautSpaceLanding from "@/components/layout/RightLogin";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -52,7 +50,9 @@ const ForgotPassword: React.FC = () => {
         showSuccessToast("Password reset link sent successfully!");
         router.push("/auth/login");
       } else {
-        showErrorToast(response?.message || "Failed to send password reset link.");
+        showErrorToast(
+          response?.message || "Failed to send password reset link."
+        );
       }
     },
     onError: (error: any) => {
@@ -89,7 +89,8 @@ const ForgotPassword: React.FC = () => {
 
       const addParticle = () => {
         const particle = document.createElement("div");
-        particle.className = "absolute bg-white/60 rounded-full animate-float-up";
+        particle.className =
+          "absolute bg-white/60 rounded-full animate-float-up";
         particle.style.left = `${Math.random() * 100}%`;
         particle.style.bottom = "-10px";
         const size = Math.random() * 4 + 2;
@@ -111,13 +112,15 @@ const ForgotPassword: React.FC = () => {
 
       const addShootingStar = () => {
         const shootingStar = document.createElement("div");
-        shootingStar.className = "absolute w-0.5 h-0.5 bg-white rounded-full animate-shoot";
+        shootingStar.className =
+          "absolute w-0.5 h-0.5 bg-white rounded-full animate-shoot";
         shootingStar.style.top = `${Math.random() * 50}%`;
         shootingStar.style.left = "-100px";
         shootingStar.style.boxShadow = "0 0 6px 2px rgba(255,255,255,0.8)";
 
         const tail = document.createElement("div");
-        tail.className = "absolute top-0 left-0 w-12 h-px bg-gradient-to-r from-transparent via-white to-transparent";
+        tail.className =
+          "absolute top-0 left-0 w-12 h-px bg-gradient-to-r from-transparent via-white to-transparent";
         tail.style.transform = "translateX(-48px)";
         shootingStar.appendChild(tail);
 
@@ -153,11 +156,19 @@ const ForgotPassword: React.FC = () => {
       {/* Content Container */}
       <div className="flex flex-col lg:flex-row w-full items-center justify-center max-w-5xl gap-6 relative z-10">
         {/* Left Box - Forgot Password Form */}
-        <div style={{ width: "fit-content" }} className="lg:w-1/2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl animate-fadeInLeft">
+        <div
+          style={{ width: "fit-content" }}
+          className="lg:w-1/2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl animate-fadeInLeft"
+        >
           {/* Mobile Logo */}
           <div className="flex justify-center mb-6 lg:hidden">
             <div className="w-16 h-16 rounded-xl flex items-center justify-center shadow-lg animate-float">
-              <Image src="/assets/white_logo.png" alt="logo" width={50} height={50} />
+              <Image
+                src="/assets/white_logo.png"
+                alt="logo"
+                width={50}
+                height={50}
+              />
             </div>
           </div>
 
@@ -178,7 +189,10 @@ const ForgotPassword: React.FC = () => {
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                <Mail
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={16}
+                />
                 <input
                   type="email"
                   {...register("email")}
@@ -219,33 +233,42 @@ const ForgotPassword: React.FC = () => {
             <div className="flex-grow border-t border-white/20"></div>
           </div>
 
-          
-
           <div className="text-center space-y-2 text-sm">
             <p className="text-gray-300">
               Already have an account?{" "}
-              <Link href="/auth/login" className="text-blue-400 hover:text-blue-300 transition-all duration-200">
+              <Link
+                href="/auth/login"
+                className="text-blue-400 hover:text-blue-300 transition-all duration-200"
+              >
                 Sign In
               </Link>
             </p>
             <p className="text-gray-300">
               Don&apos;t have an account?{" "}
-              <Link href="/auth/signup" className="text-blue-400 hover:text-blue-300 transition-all duration-200">
+              <Link
+                href="/auth/signup"
+                className="text-blue-400 hover:text-blue-300 transition-all duration-200"
+              >
                 Sign Up
               </Link>
             </p>
             <div className="flex justify-center space-x-3 text-xs text-gray-400">
-              {["Terms & Conditions", "Support", "Customer Service"].map((link, index) => (
-                <React.Fragment key={link}>
-                  <a
-                    href={`/${link.toLowerCase().replace(" & ", "-").replace(" ", "-")}`}
-                    className="hover:text-blue-400 transition-all duration-200"
-                  >
-                    {link}
-                  </a>
-                  {index < 2 && <span>|</span>}
-                </React.Fragment>
-              ))}
+              {["Terms & Conditions", "Support", "Customer Service"].map(
+                (link, index) => (
+                  <React.Fragment key={link}>
+                    <a
+                      href={`/${link
+                        .toLowerCase()
+                        .replace(" & ", "-")
+                        .replace(" ", "-")}`}
+                      className="hover:text-blue-400 transition-all duration-200"
+                    >
+                      {link}
+                    </a>
+                    {index < 2 && <span>|</span>}
+                  </React.Fragment>
+                )
+              )}
             </div>
           </div>
         </div>

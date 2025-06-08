@@ -97,7 +97,7 @@ export default function ContactPage() {
   return (
     <section
       id="contact"
-      className="flex flex-col items-center justify-center bg-gray-900 px-4 py-16 md:py-24"
+      className="flex flex-col items-center justify-center px-4 py-16 md:py-24"
     >
       {/* Animated Container */}
       <motion.div
