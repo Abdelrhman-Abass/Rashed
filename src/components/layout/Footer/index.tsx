@@ -10,7 +10,7 @@ const Footer = React.memo(() => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gray-900 text-white pt-12 pb-6 px-6 md:px-12">
+    <footer className=" text-white pt-12 pb-6 px-6 md:px-12">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
         {/* Logo & Description */}
         <div className="flex flex-col items-start space-y-4">
