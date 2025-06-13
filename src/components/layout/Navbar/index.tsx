@@ -56,19 +56,7 @@ const Navbar = () => {
 
           {/* Conditional Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            {isLoggedIn ? (
-              <>
-                {/* Logout Button with Icon */}
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center space-x-1 px-4 py-2 rounded-full bg-red-600 hover:bg-red-700 text-white font-medium transition-colors duration-300"
-                >
-                  <FaSignOutAlt />
-                  <span>Logout</span>
-                </button>
-              </>
-            ) : (
-              <>
+            
                 <Link href={"/auth/login"}>
                   <button className="px-4 py-2 rounded-full border border-white text-white font-medium hover:bg-white hover:text-gray-900 transition-all duration-300">
                     SignIn
@@ -79,8 +67,6 @@ const Navbar = () => {
                     LogIn
                   </button>
                 </Link>
-              </>
-            )}
           </div>
 
           {/* Mobile Menu Button */}

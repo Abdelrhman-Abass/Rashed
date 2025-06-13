@@ -22,7 +22,7 @@ export default function Home() {
             Your AI-powered fake news detector.
           </p>
           <Link
-            href="#features"
+            href="/auth/login"
             className="inline-block px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-transform transform hover:scale-105"
           >
             Get Started
