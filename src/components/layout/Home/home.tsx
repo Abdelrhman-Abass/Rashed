@@ -23,7 +23,7 @@ export default function Home() {
   return (
     <main className="text-white min-h-screen">
       <section className="relative w-full h-[80vh] md:h-screen overflow-hidden flex items-center justify-center">
-        {/* <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 z-0 pointer-events-none">
           <Canvas camera={{ position: [0, 1, 5], fov: 50 }} frameloop="demand">
             <ambientLight intensity={0.5} />
             <directionalLight position={[2, 2, 2]} intensity={0.8} />
@@ -32,7 +32,7 @@ export default function Home() {
             </Suspense>
             <Controls />
           </Canvas>
-        </div> */}
+        </div>
 
         <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-2xl mx-auto">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 leading-tight">
