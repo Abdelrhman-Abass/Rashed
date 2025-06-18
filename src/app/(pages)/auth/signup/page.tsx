@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Facebook, Chrome, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Facebook, Chrome, Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 import AstronautSpaceLanding from "@/components/layout/RightLogin";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -19,6 +19,7 @@ import Link from "next/link";
 // Define Zod schema for validation
 const signupSchema = z
   .object({
+    name: z.string().min(3, "Name must be at least 3 characters"),
     email: z.string().email("Invalid email address"),
     password: z
       .string()
@@ -37,7 +38,6 @@ type SignupFormInputs = z.infer<typeof signupSchema>;
 const Signup: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const router = useRouter();
-  // const searchParams = useSearchParams();
   const { login } = useAuthStore();
   const starsRef = useRef<HTMLDivElement>(null);
   const particlesRef = useRef<HTMLDivElement>(null);
@@ -80,6 +80,7 @@ const Signup: React.FC = () => {
   const signupMutation = useMutation({
     mutationFn: (data: SignupFormInputs) =>
       postServerRequest("/auth/register", {
+        name: data.name,
         email: data.email,
         password: data.password,
       }),
@@ -100,29 +101,9 @@ const Signup: React.FC = () => {
     },
   });
 
-  // // Handle Google OAuth callback
-  // useEffect(() => {
-  //   const token = searchParams.get("token");
-  //   const email = searchParams.get("email");
-  //   const name = searchParams.get("name");
-
-  //   if (token && email && name) {
-  //     login(token, { email, userName: name });
-  //     showSuccessToast("Google authentication successful!");
-  //     createSessionMutation.mutate();
-  //   } else if (searchParams.get("error")) {
-  //     showErrorToast("Google authentication failed. Please try again.");
-  //   }
-  // }, [createSessionMutation, login, searchParams]);
-
   // Handle form submission
   const onSubmit = (data: SignupFormInputs) => {
     signupMutation.mutate(data);
-  };
-
-  // Handle Google OAuth button click
-  const handleGoogleSignup = () => {
-    window.location.href = "/auth/google";
   };
 
   useEffect(() => {
@@ -240,6 +221,28 @@ const Signup: React.FC = () => {
 
           {/* Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div>
+              <label className="block text-white text-sm font-medium mb-1">
+                First Name
+              </label>
+              <div className="relative">
+                <User
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={16}
+                />
+                <input
+                  type="text"
+                  {...register("name")}
+                  placeholder="Enter your first name"
+                  className="w-full bg-white/10 border border-white/20 rounded-md pl-10 pr-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:bg-white/15 transition-all duration-300"
+                />
+              </div>
+              {errors.name && (
+                <p className="text-red-400 text-xs mt-1 animate-slideDown">
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
             <div>
               <label className="block text-white text-sm font-medium mb-1">
                 Email Address

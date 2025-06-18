@@ -107,3 +107,100 @@ export const generatePasswordResetEmail = (resetLink, name, supportemail) => {
   </html>
   `;
 };
+export default EmailTemplate = ({
+  firstName,
+  lastName,
+  email,
+  phone,
+  subject,
+  message,
+}) => `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Contact Form Submission</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 30px auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    .header {
+      background-color: #1a1a2e;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .content {
+      padding: 25px;
+      color: #333333;
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    .label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+      color: #555555;
+    }
+    .value {
+      display: block;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border: 1px solid #eeeeee;
+      border-radius: 4px;
+    }
+    .footer {
+      background-color: #f1f1f1;
+      text-align: center;
+      font-size: 12px;
+      color: #777777;
+      padding: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>New Contact Message</h2>
+    </div>
+    <div class="content">
+      <div class="section">
+        <span class="label">Name</span>
+        <span class="value">${firstName} ${lastName}</span>
+      </div>
+      <div class="section">
+        <span class="label">Email</span>
+        <span class="value">${email}</span>
+      </div>
+      <div class="section">
+        <span class="label">Phone</span>
+        <span class="value">${phone}</span>
+      </div>
+      <div class="section">
+        <span class="label">Subject</span>
+        <span class="value">${subject}</span>
+      </div>
+      <div class="section">
+        <span class="label">Message</span>
+        <span class="value">${message}</span>
+      </div>
+    </div>
+    <div class="footer">
+      This message was sent from your website contact form.
+    </div>
+  </div>
+</body>
+</html>
+`;

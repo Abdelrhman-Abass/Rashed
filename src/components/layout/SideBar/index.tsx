@@ -524,7 +524,6 @@
 //   );
 // }
 
-
 "use client";
 
 import { useEffect, useRef, useMemo, useState } from "react";
@@ -547,7 +546,12 @@ import Image from "next/image";
 import { useChatStore } from "@/store/chatStore";
 import { useAuthStore } from "@/store/authStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { getServerRequest, postServerRequest, deleteServerRequest, patchServerRequest } from "@/utils/generalServerRequest";
+import {
+  getServerRequest,
+  postServerRequest,
+  deleteServerRequest,
+  patchServerRequest,
+} from "@/utils/generalServerRequest";
 import { showSuccessToast, showErrorToast } from "@/utils/toast";
 
 interface Conversation {
@@ -589,9 +593,10 @@ export default function Sidebar() {
       return response;
     },
     select: (response) => {
-      const sessions = response.success && Array.isArray(response.data.data)
-        ? response.data.data
-        : [];
+      const sessions =
+        response.success && Array.isArray(response.data.data)
+          ? response.data.data
+          : [];
       return sessions;
     },
   });
@@ -732,7 +737,11 @@ export default function Sidebar() {
   };
 
   // Handle rename action
-  const handleRename = (conversationId: string, currentTitle: string, e: React.MouseEvent) => {
+  const handleRename = (
+    conversationId: string,
+    currentTitle: string,
+    e: React.MouseEvent
+  ) => {
     e.stopPropagation();
     setEditingSessionId(conversationId);
     setNewTitle(currentTitle);
@@ -760,7 +769,10 @@ export default function Sidebar() {
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
 
     if (diffInHours < 24) {
-      return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      return date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     } else if (diffInHours < 24 * 7) {
       return date.toLocaleDateString([], { weekday: "short" });
     } else {
@@ -810,9 +822,7 @@ export default function Sidebar() {
                     alt="logo"
                   />
                 </div>
-                {!isCollapsed && (
-                  <h2 className="text-xl font-bold">Rashed</h2>
-                )}
+                {!isCollapsed && <h2 className="text-xl font-bold">Rashed</h2>}
               </div>
             )}
             {isMobile && sidebarOpen && (
@@ -892,7 +902,9 @@ export default function Sidebar() {
                         {editingSessionId === conversation.id ? (
                           <div className="flex-1">
                             <form
-                              onSubmit={(e) => handleRenameSubmit(conversation.id, e)}
+                              onSubmit={(e) =>
+                                handleRenameSubmit(conversation.id, e)
+                              }
                               className="flex flex-col gap-2"
                             >
                               <input
@@ -923,7 +935,10 @@ export default function Sidebar() {
                                   className="p-1 rounded-md hover:bg-red-600"
                                   aria-label="Cancel rename"
                                 >
-                                  <XCircle size={16} className="text-zinc-100" />
+                                  <XCircle
+                                    size={16}
+                                    className="text-zinc-100"
+                                  />
                                 </button>
                               </div>
                             </form>
@@ -932,7 +947,9 @@ export default function Sidebar() {
                           <>
                             <div
                               className="flex-1 truncate cursor-pointer"
-                              onClick={() => handleConversationClick(conversation.id)}
+                              onClick={() =>
+                                handleConversationClick(conversation.id)
+                              }
                             >
                               <div className="flex items-center justify-between mb-1">
                                 <span className="text-sm font-semibold truncate flex-grow">
@@ -943,7 +960,9 @@ export default function Sidebar() {
                                     {formatTimestamp(conversation.createdAt)}
                                   </span>
                                   <button
-                                    onClick={(e) => toggleMenu(conversation.id, e)}
+                                    onClick={(e) =>
+                                      toggleMenu(conversation.id, e)
+                                    }
                                     className="p-1 rounded-md hover:bg-zinc-700 transition-colors opacity-0 group-hover:opacity-100"
                                     aria-label="Chat options"
                                   >

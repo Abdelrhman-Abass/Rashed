@@ -4,10 +4,10 @@ import Tilt from "react-parallax-tilt";
 import { motion } from "framer-motion";
 
 // Individual icon imports
-import { FaBrain } from "react-icons/fa"; // AI Detection
-import { BsStopwatchFill } from "react-icons/bs"; // Real-Time Analysis
-import { MdOutlineFactCheck } from "react-icons/md"; // Accuracy
-import { GiNewspaper } from "react-icons/gi"; // Source Verification
+import { FaBrain } from "react-icons/fa";
+import { BsStopwatchFill } from "react-icons/bs";
+import { MdOutlineFactCheck } from "react-icons/md";
+import { GiNewspaper } from "react-icons/gi";
 
 const Features = () => {
   const features = [

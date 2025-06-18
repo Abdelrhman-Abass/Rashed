@@ -1,82 +1,3 @@
-// "use client";
-// import { useEffect } from "react";
-// import { useRouter } from "next/navigation";
-// import { useAuthStore } from "@/store/authStore";
-// import { useMutation } from "@tanstack/react-query";
-// import { postServerRequest } from "@/utils/generalServerRequest";
-// import { showErrorToast } from "@/utils/toast";
-// import Link from "next/link";
-
-// export default function Page() {
-//   const router = useRouter();
-//   const { token } = useAuthStore();
-
-//   // Mutation to create a new chat session
-//   const createSessionMutation = useMutation({
-//     mutationFn: () => postServerRequest("/messages/session", { title: "New Chat" }),
-//     onSuccess: (response) => {
-//       if (response?.success) {
-//         const { sessionId } = response.data.data;
-//         router.push(`/chat/${sessionId}`);
-//       } else {
-//         showErrorToast("Failed to start a new chat session.");
-//       }
-//     },
-//     onError: () => {
-//       showErrorToast("An error occurred while starting a new chat session.");
-//     },
-//   });
-
-//   // Redirect to login if not authenticated
-//   // useEffect(() => {
-//   //   if (!token) {
-//   //     router.push("/auth/login");
-//   //   }
-//   // }, [token, router]);
-
-//   const handleStartChat = () => {
-//     createSessionMutation.mutate();
-//   };
-
-//   return (
-//     <div className="bg-[url('/assets/background.png')] bg-cover bg-center bg-no-repeat w-full h-screen relative overflow-hidden flex justify-center items-center">
-//       <div className="flex flex-col items-center bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-8 shadow-2xl max-w-md w-full my-8">
-//         <h1 className="text-3xl font-bold text-white mb-4 tracking-tight">Page Not Found</h1>
-//         <p className="text-sm text-gray-200 mb-6 text-center leading-relaxed">
-//           Oops! It looks like this chat doesn&lsquo;t exist. Start a new conversation or return to your previous chats.
-//         </p>
-//         <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-//           <button
-//             onClick={handleStartChat}
-//             disabled={createSessionMutation.isPending}
-//             className={`bg-blue-600 text-white font-semibold rounded-lg px-6 py-3 hover:bg-blue-700 transition duration-300 active:scale-95 text-sm ${
-//               createSessionMutation.isPending ? "opacity-50 cursor-not-allowed" : ""
-//             }`}
-//           >
-//             {createSessionMutation.isPending ? "Starting Chat..." : "Start New Chat"}
-//           </button>
-//           <Link
-//             href="/chat"
-//             className="bg-gray-700 text-white font-semibold rounded-lg px-6 py-3 hover:bg-gray-800 transition duration-300 active:scale-95 text-sm text-center"
-//           >
-//             Go to Previous Chats
-//           </Link>
-//         </div>
-//         <div className="mt-6 text-center">
-//           <p className="text-xs text-gray-300">
-//             Not logged in?{" "}
-//             <Link href="/auth/login" className="text-blue-400 hover:underline">
-//               Login
-//             </Link>
-//           </p>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-//------------------------------------------------------------------------------------
-//after solving the error of  floating particles
 "use client";
 import { motion } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
@@ -84,6 +5,7 @@ import { postServerRequest } from "@/utils/generalServerRequest";
 import { useRouter } from "next/navigation";
 import { showErrorToast } from "@/utils/toast";
 import FloatingParticles from "@/components/layout/FloatingParticles/FloatingParticles";
+import Link from "next/link";
 
 export default function NotFound() {
   const router = useRouter();
@@ -328,21 +250,10 @@ export default function NotFound() {
             className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-xl px-8 py-4 text-lg hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 shadow-lg hover:shadow-xl"
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => console.log("Go to previous chats")}
           >
-            📚 Previous Chats
+            <Link href="/">🏠 Go to Home page</Link>
           </motion.button>
         </motion.div>
-
-        <motion.button
-          variants={itemVariants}
-          whileHover={{ scale: 1.1, y: -2 }}
-          whileTap={{ scale: 0.95 }}
-          className="text-blue-400 hover:text-blue-300 transition-colors duration-300 underline decoration-dotted underline-offset-4"
-          onClick={() => console.log("Return to home")}
-        >
-          ← Return to Mission Control
-        </motion.button>
       </motion.div>
     </div>
   );
