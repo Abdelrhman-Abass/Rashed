@@ -7,7 +7,6 @@ import {
 import "react-vertical-timeline-component/style.min.css";
 import { motion } from "framer-motion";
 
-// Import icons
 import {
   FaRegLightbulb,
   FaPaste,
