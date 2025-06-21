@@ -1,3 +1,4 @@
+
 // "use client";
 
 // import { useEffect, useRef, useMemo, useState } from "react";
@@ -8,9 +9,6 @@
 //   X,
 //   Search,
 //   Plus,
-//   MessageSquare,
-//   Settings,
-//   Home,
 //   Trash2,
 //   MoreVertical,
 //   Edit,
@@ -52,24 +50,20 @@
 //   const [activeMenu, setActiveMenu] = useState<string | null>(null);
 //   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
 //   const [newTitle, setNewTitle] = useState("");
+//   const [searchQuery, setSearchQuery] = useState("");
 
 //   // Fetch conversations
-//   console.log("Fetching conversations...", user);
 //   const {
 //     data: conversationsResponse,
-//     refetch: fetchMessages,
 //     isLoading,
 //     error,
-//     status,
 //   } = useQuery({
 //     queryKey: ["conversations"],
 //     queryFn: async () => {
 //       const response = await getServerRequest("/list/chat-sessions");
-//       console.log("Chat Sessions Response:", response);
 //       return response;
 //     },
 //     select: (response) => {
-//       console.log("Select Function - Response:", response);
 //       const sessions = response.success && Array.isArray(response.data.data)
 //         ? response.data.data
 //         : [];
@@ -77,17 +71,14 @@
 //     },
 //   });
 
-//   // Debug conversationsResponse
-//   console.log("Conversations Response (data):", conversationsResponse);
-
 //   const conversations = useMemo(() => {
-//     console.log("useMemo - conversationsResponse:", conversationsResponse);
 //     const convArray = Array.isArray(conversationsResponse)
 //       ? conversationsResponse
 //       : [];
-//     console.log("useMemo - Processed Conversations:", convArray);
-//     return convArray;
-//   }, [conversationsResponse]);
+//     return convArray.filter((conversation: Conversation) =>
+//       conversation.title.toLowerCase().includes(searchQuery.toLowerCase())
+//     );
+//   }, [conversationsResponse, searchQuery]);
 
 //   // Create new chat
 //   const { mutate: createNewChat, isPending: isCreating } = useMutation({
@@ -95,7 +86,6 @@
 //       postServerRequest("/messages/session", { title: "New Chat" }),
 //     onSuccess: (response) => {
 //       if (response?.data?.success) {
-//         console.log("New chat created successfully, navigating...");
 //         const newSessionId = response.data.data.sessionId;
 //         router.push(`/chat/${newSessionId}`);
 //         if (isMobile) {
@@ -109,7 +99,7 @@
 //     onError: (error: any) => {
 //       showErrorToast(
 //         "An error occurred while creating the chat: " +
-//           (error.message || "Unknown error")
+//         (error.message || "Unknown error")
 //       );
 //     },
 //   });
@@ -142,7 +132,7 @@
 //     onError: (error: any) => {
 //       showErrorToast(
 //         "An error occurred while deleting the chat: " +
-//           (error.message || "Unknown error")
+//         (error.message || "Unknown error")
 //       );
 //     },
 //   });
@@ -167,7 +157,7 @@
 //     onError: (error: any) => {
 //       showErrorToast(
 //         "An error occurred while renaming the chat: " +
-//           (error.message || "Unknown error")
+//         (error.message || "Unknown error")
 //       );
 //     },
 //   });
@@ -215,7 +205,7 @@
 //   const toggleMenu = (conversationId: string, e: React.MouseEvent) => {
 //     e.stopPropagation();
 //     setActiveMenu(activeMenu === conversationId ? null : conversationId);
-//     setEditingSessionId(null); // Close any open rename input
+//     setEditingSessionId(null);
 //   };
 
 //   // Handle rename action
@@ -240,6 +230,11 @@
 //     setNewTitle("");
 //   };
 
+//   // Handle search input change
+//   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     setSearchQuery(e.target.value);
+//   };
+
 //   // Format timestamp for display
 //   const formatTimestamp = (createdAt: string) => {
 //     const date = new Date(createdAt);
@@ -259,7 +254,7 @@
 //     <>
 //       {isMobile && !sidebarOpen && (
 //         <button
-//           className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-[#0f0f23] text-zinc-100 shadow-lg md penetrating-hidden hover:scale-105 transition-transform"
+//           className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-[#0f0f23] text-zinc-100 shadow-lg md:hidden hover:scale-105 transition-transform"
 //           onClick={() => toggleSidebar()}
 //           aria-label="Open menu"
 //         >
@@ -271,34 +266,39 @@
 //         ref={sidebarRef}
 //         className={`fixed bg-[#0f0f23] inset-y-0 left-0 text-zinc-100 shadow-lg transform transition-all duration-300 ease-in-out z-40
 //           ${isMobile ? "w-64" : isCollapsed ? "w-16" : "w-64"}
-//           ${
-//             isMobile
-//               ? sidebarOpen
-//                 ? "translate-x-0"
-//                 : "-translate-x-full"
-//               : "translate-x-0"
+//           ${isMobile
+//             ? sidebarOpen
+//               ? "translate-x-0"
+//               : "-translate-x-full"
+//             : "translate-x-0"
 //           }`}
 //       >
 //         <div className="flex h-full flex-col p-3 overflow-hidden bg-[#0f0f23]">
 //           {/* Header */}
 //           <div
-//             className={`flex items-center ${
-//               isCollapsed && !isMobile ? "justify-center" : "justify-between"
-//             } pb-4 pt-2 border-b border-zinc-800`}
+//             className={`flex items-center ${isCollapsed && !isMobile ? "justify-center" : "justify-between"
+//               } pb-4 pt-2 border-b border-zinc-800`}
 //           >
 //             {(!isCollapsed || isMobile) && (
-//               <div className="flex items-center gap-x-3">
-//                 <div className="h-8 w-8 rounded-full flex items-center justify-center">
-//                   <Image
-//                     src={"/assets/logo.webp"}
-//                     height={35}
-//                     width={35}
-//                     loading="lazy"
-//                     alt="logo"
-//                   />
+//               <div className="mt-4 relative">
+//                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+//                   <Search size={16} className="text-zinc-400" />
 //                 </div>
-//                 {!isCollapsed && (
-//                   <h2 className="text-xl font-bold">Rashed</h2>
+//                 <input
+//                   type="text"
+//                   placeholder="Search conversations"
+//                   value={searchQuery}
+//                   onChange={handleSearchChange}
+//                   className="w-full pl-10 pr-10 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-sm text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+//                 />
+//                 {searchQuery && (
+//                   <button
+//                     onClick={() => setSearchQuery("")}
+//                     className="absolute inset-y-0 right-0 pr-3 flex items-center"
+//                     aria-label="Clear search"
+//                   >
+//                     <XCircle size={16} className="text-zinc-400 hover:text-zinc-100" />
+//                   </button>
 //                 )}
 //               </div>
 //             )}
@@ -326,11 +326,10 @@
 //           <button
 //             onClick={() => createNewChat()}
 //             disabled={isCreating}
-//             className={`w-full mt-4 px-4 py-2 cursor-pointer bg-indigo-600 hover:bg-indigo-700 text-white transition-colors rounded-lg flex items-center ${
-//               isCollapsed && !isMobile
+//             className={`w-full mt-4 px-4 py-2 cursor-pointer bg-indigo-600 hover:bg-indigo-700 text-white transition-colors rounded-lg flex items-center ${isCollapsed && !isMobile
 //                 ? "justify-center"
 //                 : "justify-center gap-x-2"
-//             } ${isCreating ? "opacity-50 cursor-not-allowed" : ""}`}
+//               } ${isCreating ? "opacity-50 cursor-not-allowed" : ""}`}
 //           >
 //             <Plus size={18} />
 //             {!isCollapsed && (
@@ -362,119 +361,126 @@
 //                 <div className="text-center text-zinc-400">Loading...</div>
 //               ) : error ? (
 //                 <div className="text-center text-red-500">
-//                   Error: {error.message || "Failed to load chats"}
+//                   Error: {(error as any)?.message || "Failed to load chats"}
 //                 </div>
 //               ) : conversations.length === 0 ? (
 //                 <div className="text-center text-zinc-400">
-//                   No chats available
+//                   {searchQuery
+//                     ? "No chats match your search"
+//                     : "No chats available"}
 //                 </div>
 //               ) : (
 //                 <ul className="space-y-1">
 //                   {conversations.map((conversation: Conversation) => (
 //                     <li
 //                       key={conversation.id}
-//                       className="px-3 py-2 rounded-lg hover:bg-zinc-800 transition-colors flex items-center group"
+//                       className="px-3 py-2 rounded-lg hover:bg-zinc-800 transition-colors group relative"
 //                     >
-//                       {editingSessionId === conversation.id ? (
-//                         <form
-//                           onSubmit={(e) => handleRenameSubmit(conversation.id, e)}
-//                           className="flex-1 flex items-center gap-2"
-//                         >
-//                           <input
-//                             type="text"
-//                             value={newTitle}
-//                             onChange={(e) => setNewTitle(e.target.value)}
-//                             onClick={(e) => e.stopPropagation()}
-//                             className="flex-grow px-2 py-1 bg-zinc-700 border border-zinc-600 rounded-md text-sm text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-//                             autoFocus
-//                             maxLength={100}
-//                           />
-//                           <button
-//                             type="submit"
-//                             disabled={isRenaming || !newTitle.trim()}
-//                             className={`p-1 rounded-md ${
-//                               isRenaming || !newTitle.trim()
-//                                 ? "opacity-50 cursor-not-allowed"
-//                                 : "hover:bg-indigo-600"
-//                             }`}
-//                             aria-label="Save rename"
-//                           >
-//                             <Check size={16} className="text-zinc-100" />
-//                           </button>
-//                           <button
-//                             type="button"
-//                             onClick={handleRenameCancel}
-//                             className="p-1 rounded-md hover:bg-red-600"
-//                             aria-label="Cancel rename"
-//                           >
-//                             <XCircle size={16} className="text-zinc-100" />
-//                           </button>
-//                         </form>
-//                       ) : (
-//                         <>
-//                           <div
-//                             className="flex-1 truncate cursor-pointer"
-//                             onClick={() => handleConversationClick(conversation.id)}
-//                           >
-//                             <div className="flex items-center justify-between mb-1">
-//                               <span className="text-sm font-semibold truncate flex-grow">
-//                                 {conversation.title}
-//                               </span>
-//                               <div className="flex items-center gap-2">
-//                                 <span className="text-xs text-zinc-400">
-//                                   {formatTimestamp(conversation.createdAt)}
-//                                 </span>
+//                       <div className="flex items-center">
+//                         {editingSessionId === conversation.id ? (
+//                           <div className="flex-1">
+//                             <form
+//                               onSubmit={(e) => handleRenameSubmit(conversation.id, e)}
+//                               className="flex flex-col gap-2"
+//                             >
+//                               <input
+//                                 type="text"
+//                                 value={newTitle}
+//                                 onChange={(e) => setNewTitle(e.target.value)}
+//                                 onClick={(e) => e.stopPropagation()}
+//                                 className="w-full px-2 py-1 bg-zinc-700 border border-zinc-600 rounded-md text-sm text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+//                                 autoFocus
+//                                 maxLength={100}
+//                               />
+//                               <div className="flex gap-2">
 //                                 <button
-//                                   onClick={(e) => toggleMenu(conversation.id, e)}
-//                                   className="p-1 rounded-md hover:bg-zinc-700 transition-colors opacity-0 group-hover:opacity-100"
-//                                   aria-label="Chat options"
+//                                   type="submit"
+//                                   disabled={isRenaming || !newTitle.trim()}
+//                                   className={`p-1 rounded-md ${isRenaming || !newTitle.trim()
+//                                       ? "opacity-50 cursor-not-allowed"
+//                                       : "hover:bg-indigo-600"
+//                                     }`}
+//                                   aria-label="Save rename"
 //                                 >
-//                                   <MoreVertical
-//                                     size={16}
-//                                     className="text-zinc-400"
-//                                   />
+//                                   <Check size={16} className="text-zinc-100" />
+//                                 </button>
+//                                 <button
+//                                   type="button"
+//                                   onClick={handleRenameCancel}
+//                                   className="p-1 rounded-md hover:bg-red-600"
+//                                   aria-label="Cancel rename"
+//                                 >
+//                                   <XCircle size={16} className="text-zinc-100" />
 //                                 </button>
 //                               </div>
-//                             </div>
+//                             </form>
 //                           </div>
-//                           <AnimatePresence>
-//                             {activeMenu === conversation.id && (
-//                               <motion.div
-//                                 initial={{ opacity: 0, scale: 0.8, y: -10 }}
-//                                 animate={{ opacity: 1, scale: 1, y: 0 }}
-//                                 exit={{ opacity: 0, scale: 0.8, y: -10 }}
-//                                 transition={{ duration: 0.2 }}
-//                                 className="absolute right-2 top-10 z-50 bg-zinc-800 border border-zinc-700 rounded-md shadow-lg"
-//                               >
-//                                 <button
-//                                   onClick={(e) =>
-//                                     handleRename(
-//                                       conversation.id,
-//                                       conversation.title,
-//                                       e
-//                                     )
-//                                   }
-//                                   className="w-full px-4 py-2 text-sm text-zinc-100 hover:bg-zinc-700 flex items-center gap-2"
+//                         ) : (
+//                           <>
+//                             <div
+//                               className="flex-1 truncate cursor-pointer"
+//                               onClick={() => handleConversationClick(conversation.id)}
+//                             >
+//                               <div className="flex items-center justify-between mb-1">
+//                                 <span className="text-sm font-semibold truncate flex-grow">
+//                                   {conversation.title}
+//                                 </span>
+//                                 <div className="flex items-center gap-2">
+//                                   <span className="text-xs text-zinc-400">
+//                                     {formatTimestamp(conversation.createdAt)}
+//                                   </span>
+//                                   <button
+//                                     onClick={(e) => toggleMenu(conversation.id, e)}
+//                                     className="p-1 rounded-md hover:bg-zinc-700 transition-colors opacity-0 group-hover:opacity-100"
+//                                     aria-label="Chat options"
+//                                   >
+//                                     <MoreVertical
+//                                       size={16}
+//                                       className="text-zinc-400"
+//                                     />
+//                                   </button>
+//                                 </div>
+//                               </div>
+//                             </div>
+//                             <AnimatePresence>
+//                               {activeMenu === conversation.id && (
+//                                 <motion.div
+//                                   initial={{ opacity: 0, scale: 0.8, y: -10 }}
+//                                   animate={{ opacity: 1, scale: 1, y: 0 }}
+//                                   exit={{ opacity: 0, scale: 0.8, y: -10 }}
+//                                   transition={{ duration: 0.2 }}
+//                                   className="absolute right-2 top-8 z-50 bg-zinc-800 border border-zinc-700 rounded-md shadow-lg"
 //                                 >
-//                                   <Edit size={14} />
-//                                   Rename
-//                                 </button>
-//                                 <button
-//                                   onClick={(e) => {
-//                                     e.stopPropagation();
-//                                     deleteChat(conversation.id);
-//                                     setActiveMenu(null);
-//                                   }}
-//                                   className="w-full px-4 py-2 text-sm text-zinc-100 hover:bg-red-600 flex items-center gap-2"
-//                                 >
-//                                   <Trash2 size={14} />
-//                                   Delete
-//                                 </button>
-//                               </motion.div>
-//                             )}
-//                           </AnimatePresence>
-//                         </>
-//                       )}
+//                                   <button
+//                                     onClick={(e) =>
+//                                       handleRename(
+//                                         conversation.id,
+//                                         conversation.title,
+//                                         e
+//                                       )
+//                                     }
+//                                     className="w-full px-4 py-2 text-sm text-zinc-100 hover:bg-zinc-700 flex items-center gap-2"
+//                                   >
+//                                     <Edit size={14} />
+//                                     Rename
+//                                   </button>
+//                                   <button
+//                                     onClick={(e) => {
+//                                       e.stopPropagation();
+//                                       deleteChat(conversation.id);
+//                                       setActiveMenu(null);
+//                                     }}
+//                                     className="w-full px-4 py-2 text-sm text-zinc-100 hover:bg-red-600 flex items-center gap-2"
+//                                   >
+//                                     <Trash2 size={14} />
+//                                     Delete
+//                                   </button>
+//                                 </motion.div>
+//                               )}
+//                             </AnimatePresence>
+//                           </>
+//                         )}
+//                       </div>
 //                     </li>
 //                   ))}
 //                 </ul>
@@ -484,24 +490,24 @@
 
 //           {/* User Profile */}
 //           <div
-//             className={`mt-auto pt-4 border-t border-zinc-800 ${
-//               isCollapsed && !isMobile ? "px-0" : "px-3"
-//             }`}
+//             className={`mt-auto pt-4 border-t border-zinc-800 ${isCollapsed && !isMobile ? "px-0" : "px-3"
+//               }`}
 //           >
 //             <div
-//               className={`flex items-center ${
-//                 isCollapsed && !isMobile ? "justify-center" : "gap-x-3"
-//               }`}
+//               className={`flex items-center ${isCollapsed && !isMobile ? "justify-center" : "gap-x-3"
+//                 }`}
 //             >
 //               <div className="h-8 w-8 rounded-full bg-zinc-700 flex items-center justify-center text-sm font-bold">
-//                 {user?.userName?.charAt(0).toUpperCase()}
+//                 {user?.userName?.charAt(0)?.toUpperCase() || "?"}
 //               </div>
 //               {!isCollapsed && (
 //                 <div className="min-w-0">
 //                   <p className="text-sm font-medium truncate">
-//                     {user?.userName}
+//                     {user?.userName || "Guest"}
 //                   </p>
-//                   <p className="text-xs text-zinc-400 truncate">{user?.email}</p>
+//                   <p className="text-xs text-zinc-400 truncate">
+//                     {user?.email || "No email"}
+//                   </p>
 //                 </div>
 //               )}
 //             </div>
@@ -523,6 +529,8 @@
 //     </>
 //   );
 // }
+
+
 
 "use client";
 
@@ -546,12 +554,7 @@ import Image from "next/image";
 import { useChatStore } from "@/store/chatStore";
 import { useAuthStore } from "@/store/authStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import {
-  getServerRequest,
-  postServerRequest,
-  deleteServerRequest,
-  patchServerRequest,
-} from "@/utils/generalServerRequest";
+import { getServerRequest, postServerRequest, deleteServerRequest, patchServerRequest } from "@/utils/generalServerRequest";
 import { showSuccessToast, showErrorToast } from "@/utils/toast";
 
 interface Conversation {
@@ -576,10 +579,11 @@ export default function Sidebar() {
   const { id: currentSessionId } = useParams();
   const queryClient = useQueryClient();
 
-  // State for dropdown menu and rename input
+  // State for dropdown menu, rename input, and search query
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [newTitle, setNewTitle] = useState("");
+  const [searchQuery, setSearchQuery] = useState(""); // New state for search query
 
   // Fetch conversations
   const {
@@ -593,10 +597,9 @@ export default function Sidebar() {
       return response;
     },
     select: (response) => {
-      const sessions =
-        response.success && Array.isArray(response.data.data)
-          ? response.data.data
-          : [];
+      const sessions = response.success && Array.isArray(response.data.data)
+        ? response.data.data
+        : [];
       return sessions;
     },
   });
@@ -605,8 +608,11 @@ export default function Sidebar() {
     const convArray = Array.isArray(conversationsResponse)
       ? conversationsResponse
       : [];
-    return convArray;
-  }, [conversationsResponse]);
+    // Filter conversations based on search query
+    return convArray.filter((conversation: Conversation) =>
+      conversation.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [conversationsResponse, searchQuery]);
 
   // Create new chat
   const { mutate: createNewChat, isPending: isCreating } = useMutation({
@@ -672,7 +678,9 @@ export default function Sidebar() {
     onSuccess: (response, { sessionId }) => {
       if (response?.success) {
         showSuccessToast("Chat renamed successfully!");
+        // Invalidate both conversations and specific chatInfo query
         queryClient.invalidateQueries({ queryKey: ["conversations"] });
+        queryClient.invalidateQueries({ queryKey: ["chatInfo", sessionId] });
         setEditingSessionId(null);
         setNewTitle("");
         if (isMobile) {
@@ -737,11 +745,7 @@ export default function Sidebar() {
   };
 
   // Handle rename action
-  const handleRename = (
-    conversationId: string,
-    currentTitle: string,
-    e: React.MouseEvent
-  ) => {
+  const handleRename = (conversationId: string, currentTitle: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setEditingSessionId(conversationId);
     setNewTitle(currentTitle);
@@ -762,6 +766,11 @@ export default function Sidebar() {
     setNewTitle("");
   };
 
+  // Handle search input change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
   // Format timestamp for display
   const formatTimestamp = (createdAt: string) => {
     const date = new Date(createdAt);
@@ -769,10 +778,7 @@ export default function Sidebar() {
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
 
     if (diffInHours < 24) {
-      return date.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+      return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     } else if (diffInHours < 24 * 7) {
       return date.toLocaleDateString([], { weekday: "short" });
     } else {
@@ -822,7 +828,9 @@ export default function Sidebar() {
                     alt="logo"
                   />
                 </div>
-                {!isCollapsed && <h2 className="text-xl font-bold">Rashed</h2>}
+                {!isCollapsed && (
+                  <h2 className="text-xl font-bold">Rashed</h2>
+                )}
               </div>
             )}
             {isMobile && sidebarOpen && (
@@ -870,6 +878,8 @@ export default function Sidebar() {
               <input
                 type="text"
                 placeholder="Search conversations"
+                value={searchQuery}
+                onChange={handleSearchChange}
                 className="w-full pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-sm text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-indigo-500"
               />
             </div>
@@ -889,7 +899,9 @@ export default function Sidebar() {
                 </div>
               ) : conversations.length === 0 ? (
                 <div className="text-center text-zinc-400">
-                  No chats available
+                  {searchQuery
+                    ? "No chats match your search"
+                    : "No chats available"}
                 </div>
               ) : (
                 <ul className="space-y-1">
@@ -902,9 +914,7 @@ export default function Sidebar() {
                         {editingSessionId === conversation.id ? (
                           <div className="flex-1">
                             <form
-                              onSubmit={(e) =>
-                                handleRenameSubmit(conversation.id, e)
-                              }
+                              onSubmit={(e) => handleRenameSubmit(conversation.id, e)}
                               className="flex flex-col gap-2"
                             >
                               <input
@@ -935,10 +945,7 @@ export default function Sidebar() {
                                   className="p-1 rounded-md hover:bg-red-600"
                                   aria-label="Cancel rename"
                                 >
-                                  <XCircle
-                                    size={16}
-                                    className="text-zinc-100"
-                                  />
+                                  <XCircle size={16} className="text-zinc-100" />
                                 </button>
                               </div>
                             </form>
@@ -947,9 +954,7 @@ export default function Sidebar() {
                           <>
                             <div
                               className="flex-1 truncate cursor-pointer"
-                              onClick={() =>
-                                handleConversationClick(conversation.id)
-                              }
+                              onClick={() => handleConversationClick(conversation.id)}
                             >
                               <div className="flex items-center justify-between mb-1">
                                 <span className="text-sm font-semibold truncate flex-grow">
@@ -960,9 +965,7 @@ export default function Sidebar() {
                                     {formatTimestamp(conversation.createdAt)}
                                   </span>
                                   <button
-                                    onClick={(e) =>
-                                      toggleMenu(conversation.id, e)
-                                    }
+                                    onClick={(e) => toggleMenu(conversation.id, e)}
                                     className="p-1 rounded-md hover:bg-zinc-700 transition-colors opacity-0 group-hover:opacity-100"
                                     aria-label="Chat options"
                                   >
@@ -1063,5 +1066,3 @@ export default function Sidebar() {
     </>
   );
 }
-
-// export default Sidebar;

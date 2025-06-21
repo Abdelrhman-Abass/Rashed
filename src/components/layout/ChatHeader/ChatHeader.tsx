@@ -2,6 +2,7 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getServerRequest } from "../../../utils/generalServerRequest";
 import { useAuthStore } from "@/store/authStore";
+import { LogOut } from "lucide-react";
 
 const ChatHeader = ({
   sessionId,
@@ -39,9 +40,12 @@ const ChatHeader = ({
         {/* Logout Button - Positioned at the Right End */}
         <button
           onClick={onLogout}
-          className="ml-auto px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors duration-200"
+          className="group ml-auto flex items-center gap-2 rounded-md cursor-pointer bg-transparent p-2 text-gray-400 transition-colors duration-200 hover:bg-gray-700 hover:text-white"
         >
-          Logout
+          <LogOut className="h-5 w-5" />
+          <span className="hidden text-sm font-medium group-hover:block">
+            Logout
+          </span>
         </button>
       </div>
     </header>

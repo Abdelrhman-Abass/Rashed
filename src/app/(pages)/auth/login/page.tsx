@@ -70,6 +70,7 @@ const Login: React.FC = () => {
     mutationFn: (data: LoginFormInputs) =>
       postServerRequest("/auth/login", data),
     onSuccess: (response) => {
+      // console.log("Login Response:", response); // Debug the response
       if (response?.data?.success) {
         const { token, user } = response.data.data;
         login(token, { email: user.email, userName: user.name });

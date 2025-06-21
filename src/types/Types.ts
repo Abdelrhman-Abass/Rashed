@@ -31,6 +31,8 @@ export interface MessageType {
     content: string;
     isFromBot: boolean;
     createdAt: string;
+    type?: string; // Added for "FILE" type
+    fileName?: string; // Added for filename from API response
   }
 
 

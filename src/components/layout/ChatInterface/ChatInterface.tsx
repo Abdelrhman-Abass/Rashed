@@ -67,6 +67,8 @@ export default function ChatInterface() {
         fetchMessages();
         setNewMessage("");
         queryClient.invalidateQueries({ queryKey: ["conversations"] });
+        queryClient.invalidateQueries({ queryKey: ["chatInfo", sessionId] });
+
       } else {
         showErrorToast(response.message || "Failed to send message.");
       }
@@ -144,6 +146,7 @@ export default function ChatInterface() {
   // };
 
   // Handle PDF download with user choice
+  
   const downloadAsPDF = async (messageId: string, includeQuestion: boolean) => {
     const message = messages.find((msg: Message) => msg.id === messageId);
     if (!message) {
@@ -170,104 +173,133 @@ export default function ChatInterface() {
       // Constants for layout
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 15;
+      const margin = 20;
       const maxWidth = pageWidth - 2 * margin;
+      const lineHeight = 6;
+      const headerSpace = 10;
+      const sectionSpace = 8;
 
-      // Header: Colored background, logo, and title
-      pdf.setFillColor(255, 255, 255); // Blue from bg-indigo-500
-      pdf.rect(0, 0, pageWidth, 40, "F");
+      // Normalize text to handle special characters and format lists
+      const normalizeText = (text: string) => {
+        // Replace special characters
+        const normalized = text
+          .replace(/\\n/g, "\n") // Handle newlines
+          .replace(/[\b]/g, "") // Remove backspaces
+          .replace(/\t/g, "    ") // Replace tabs with spaces
+          .replace(/[^\x20-\x7E\n]/g, ""); // Remove non-printable characters
+
+        // Format lists (e.g., "- Item" to proper bullet points)
+        const lines = normalized.split("\n");
+        const formattedLines = lines.map((line) => {
+          if (line.trim().startsWith("-")) {
+            return `• ${line.trim().slice(1).trim()}`; // Replace "-" with bullet point
+          }
+          return line;
+        });
+        return formattedLines.join("\n");
+      };
+
+      // Function to add text with page break handling
+      const addTextWithPageBreak = (text: string, x: number, y: number, fontSize: number, style: string) => {
+        pdf.setFont("helvetica", style);
+        pdf.setFontSize(fontSize);
+        const lines = pdf.splitTextToSize(text, maxWidth);
+        let currentY = y;
+
+        for (const line of lines) {
+          if (currentY + lineHeight > pageHeight - 30) {
+            pdf.addPage();
+            currentY = margin;
+          }
+          pdf.text(line, x, currentY);
+          currentY += lineHeight;
+        }
+        return currentY;
+      };
+
+      // Header: Logo and Title
+      let yPosition = margin;
+      const logoWidth = 25;
+      const logoHeight = 25;
+      const logoX = (pageWidth - logoWidth) / 2;
+
       try {
-        const logoPath = "/assets/logo.webp";
-        pdf.addImage(logoPath, "WEBP", margin, 5, 15, 15); // Smaller logo
+        const logoPath = "/assets/transparent_logo.png";
+        pdf.addImage(logoPath, "PNG", logoX, yPosition, logoWidth, logoHeight);
       } catch (error) {
         console.warn("Failed to load logo, using placeholder:", error);
-        pdf.setFillColor(200, 200, 200);
-        pdf.rect(margin, 5, 15, 15, "F");
+        pdf.setFillColor(220, 220, 220);
+        pdf.rect(logoX, yPosition, logoWidth, logoHeight, "F");
         pdf.setTextColor(0);
-        pdf.setFontSize(8);
-        pdf.text("Logo", margin + 7.5, 12.5, { align: "center" });
+        pdf.setFontSize(10);
+        pdf.text("Logo", logoX + logoWidth / 2, yPosition + logoHeight / 2, { align: "center" });
       }
 
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(22);
-      pdf.setTextColor(75, 85, 99); // White text for contrast
-      pdf.text("Rashed's Report", pageWidth / 2, 20, { align: "center" });
-      pdf.setFontSize(14);
-      pdf.text("Chatbot Response Report", pageWidth / 2, 30, { align: "center" });
 
-      // Body: Question (if included) and Response
-      pdf.setTextColor(75, 85, 99); // Dark gray (gray-600)
-      let yPosition = 50;
+
+
+      yPosition += logoHeight + 15;
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(21);
+      pdf.setTextColor(0, 0, 0); // Black text on white background
+      pdf.text("Rashed's Report", pageWidth / 2, yPosition, { align: "center" });
+
+      yPosition += 10;
+      pdf.setFontSize(16);
+      pdf.text("Chatbot Response Report", pageWidth / 2, yPosition, { align: "center" });
+
+      // Body
+      yPosition += 15;
 
       if (includeQuestion && userQuestion) {
         // Question Section
-        pdf.setFillColor(255, 255, 255); // Light blue-gray (slate-100)
-        pdf.rect(margin, yPosition - 5, maxWidth, 20 + userQuestion.length * 6, "F");
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(14);
-        pdf.setTextColor(59, 130, 246); // Blue text
-        pdf.text("Asked Question", margin + 5, yPosition);
-        pdf.setFont("helvetica", "italic"); // Italic for question
-        pdf.setFontSize(12);
-        pdf.setTextColor(75, 85, 99); // Dark gray
-        const questionLines = pdf.splitTextToSize(userQuestion, maxWidth - 10);
-        yPosition += 10;
-        pdf.text(questionLines, margin + 5, yPosition);
-        yPosition += questionLines.length * 6 + 15; // Extra spacing
-        // Separator line
-        // pdf.setDrawColor(59, 130, 246);
-        // pdf.setLineWidth(0.2);
-        // pdf.line(margin, yPosition - 5, pageWidth - margin, yPosition - 5);
+        yPosition = addTextWithPageBreak("Asked Question", margin, yPosition, 14, "bold");
+        yPosition += sectionSpace;
+
+        const normalizedQuestion = normalizeText(userQuestion);
+        yPosition = addTextWithPageBreak(normalizedQuestion, margin, yPosition, 12, "normal");
+        yPosition += sectionSpace;
+
+        
       }
 
       // Response Section
-      pdf.setFillColor(255, 255, 255); // Light gray (gray-50)
-      pdf.rect(margin, yPosition - 5, maxWidth, 20 + message.content.length * 6, "F");
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(14);
-      pdf.setTextColor(55, 65, 81); // Dark gray text
-      pdf.text("Bot Response", margin + 5, yPosition);
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(12);
-      pdf.setTextColor(75, 85, 99); // Dark gray
-      const messageLines = pdf.splitTextToSize(message.content, maxWidth - 10);
-      yPosition += 10;
-      pdf.text(messageLines, margin + 5, yPosition);
-      yPosition += messageLines.length * 6 + 15;
+      yPosition = addTextWithPageBreak("Bot Response", margin, yPosition, 14, "bold");
+      yPosition += sectionSpace;
 
-      // Handle page overflow
-      if (yPosition > pageHeight - 60) {
+      const normalizedMessage = normalizeText(message.content);
+      yPosition = addTextWithPageBreak(normalizedMessage, margin, yPosition, 12, "normal");
+
+      // Footer
+      if (yPosition + 20 > pageHeight - 30) {
         pdf.addPage();
-        yPosition = 20;
+        yPosition = margin;
       }
 
-      // Footer: Border and text
-      pdf.setDrawColor(200);
-      pdf.line(margin, pageHeight - 30, pageWidth - margin, pageHeight - 30);
-      pdf.setFontSize(8);
+      pdf.setDrawColor(0, 0, 0, 0.3);
+      pdf.line(margin, pageHeight - 25, pageWidth - margin, pageHeight - 25);
+      pdf.setFontSize(10);
       pdf.setTextColor(100);
       pdf.text(
-        `Generated by Rashed's Chatbot on ${new Date().toLocaleString()}`,
-        pageWidth / 2,
-        pageHeight - 20,
-        { align: "center" }
-      );
-      const frontUrl = process.env.NEXT_PUBLIC_FRONT_CLIENT || "http://localhost:3000";
-      pdf.text(
-        `Session URL: ${frontUrl}/chat/${sessionId}`,
+        `Generated by Rashed's Chatbot on ${new Date().toLocaleString("en-US", { timeZone: "Europe/Helsinki" })}`,
         pageWidth / 2,
         pageHeight - 15,
         { align: "center" }
       );
 
       // Save PDF
-      pdf.save(`chatbot-report-${messageId.slice(0, 5)}.pdf`);
+      const pdfName = userQuestion ? userQuestion.split(" ").slice(0, 3).join(" ") : "chatbot-report";
+      // pdf.save(`${pdfName.replace(/[^a-zA-Z0-9]/g, "_")}-${messageId.slice(0, 5)}.pdf`);
+      pdf.save(`Rashed-report ${userQuestion ? userQuestion.split(" ").slice(0, 3).join(" ") : message.content.split("").slice(0, 3)}.pdf`);
+
       showSuccessToast("Report downloaded successfully!");
     } catch (error) {
       console.error("Error generating PDF:", error);
-      showErrorToast("Failed to download report as PDF.");
+      showErrorToast("Failed to generate PDF report.");
     }
   };
+
 
   // Handle PDF prompt
   const handleDownloadPrompt = (messageId: string) => {
@@ -347,6 +379,7 @@ export default function ChatInterface() {
               onFileChange={handleFileChange}
               isSending={isSending}
               start={true}
+              sessionId={String(sessionId)}
             />
           </div>
         </div>
@@ -363,17 +396,19 @@ export default function ChatInterface() {
                 />
               ))}
               <div ref={messagesEndRef} />
+              {showScrollButton && (
+                <button
+                  onClick={scrollToBottom}
+                  className="fixed absolute right-8 md:right-30 bottom-28 z-10 p-2 border-1 rounded-full bg-[#2e3033] shadow-lg  transition-colors"
+                  aria-label="Scroll to bottom"
+                >
+                  <ChevronDown className="h-4 w-4 text-white" />
+                </button>
+              )}
+
             </div>
 
-            {showScrollButton && (
-              <button
-                onClick={scrollToBottom}
-                className="fixed right-8 bottom-24 z-10 p-3 rounded-full bg-indigo-500 shadow-lg hover:bg-indigo-600 transition-colors"
-                aria-label="Scroll to bottom"
-              >
-                <ChevronDown className="h-5 w-5 text-white" />
-              </button>
-            )}
+
           </div>
 
           <ChatInput
@@ -383,6 +418,8 @@ export default function ChatInterface() {
             onFileChange={handleFileChange}
             isSending={isSending}
             start={false}
+            sessionId={String(sessionId)}
+
           />
         </>
       )}
